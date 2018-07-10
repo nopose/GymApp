@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using GymApp.Models;
+using System.Net;
+using Newtonsoft.Json;
+using GymApp.APIModels;
 
 namespace GymApp.Controllers
 {
@@ -12,7 +15,7 @@ namespace GymApp.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return View(new DashboardViewModel());
         }
 
         public IActionResult About()
@@ -22,11 +25,16 @@ namespace GymApp.Controllers
             return View();
         }
 
-        public IActionResult Contact()
+        public IActionResult Exercises(int startIndex = 0, int pageSize = 20)
         {
-            ViewData["Message"] = "Your contact page.";
+            ExercisesViewModel model = new ExercisesViewModel();
+            return View(model);
+        }
 
-            return View();
+        public IActionResult NavExercises(string query)
+        {
+            ExercisesViewModel model = new ExercisesViewModel(query);
+            return View("Exercises", model);
         }
 
         public IActionResult Error()

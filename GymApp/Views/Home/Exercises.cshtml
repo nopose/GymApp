@@ -1,0 +1,33 @@
+﻿@model ExercisesViewModel
+@*<script>
+        $("#next").click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "/home/page/",
+            data: {
+                id: $(this).val(), // < note use of 'this' here
+                access_token: $("#access_token").val()
+            },
+            success: function(result) {
+                alert('ok');
+            },
+            error: function(result) {
+                alert('error');
+            }
+        });
+    });
+    </script>*@
+
+
+
+
+<h2>Exercises</h2>
+
+@foreach (Exercise ex in Model.Exercises.results)
+{
+    @ex.name
+}
+
+@Html.ActionLink("Next page", "NavExercises", "Home", new { query = Model.Exercises.next }, new { @class = "btn btn-primary"})
+<button id="next" type="button" class="btn btn-primary">Next</button>
