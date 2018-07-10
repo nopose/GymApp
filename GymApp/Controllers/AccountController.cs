@@ -29,6 +29,13 @@ namespace GymApp.Controllers
         }
 
         [HttpGet]
+        public IActionResult Manage(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View(new ManageViewModel());
+        }
+
+        [HttpGet]
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null)
         {
@@ -44,7 +51,10 @@ namespace GymApp.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new AppUser { UserName = model.Email, Email = model.Email };
+                var user = new AppUser { FirstName = model.FirstName,
+                                         LastName = model.LastName,
+                                         UserName = model.Email,
+                                         Email = model.Email };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
