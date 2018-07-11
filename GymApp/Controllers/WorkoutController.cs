@@ -35,7 +35,9 @@ namespace GymApp.Controllers
 
             if (userID != null)
             {
-                workouts = _context.Workouts.ToList();
+                workouts = _context.Workouts
+                    .Where(W => W.uid.Equals(userID))
+                    .ToList();
             }
 
             return View("Program", workouts);

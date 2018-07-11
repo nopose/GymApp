@@ -10,7 +10,7 @@ namespace GymApp.Models
     {
         [Key]
         public int id { get; set; }
-        public int uid { get; set; } // User ID
+        public string uid { get; set; } // User ID
 
         public string name { get; set; }
         public string description { get; set; }
@@ -50,7 +50,7 @@ namespace GymApp.Models
         [Key]
         public int id { get; set; }
 
-        public int uid { get; set; }
+        public string uid { get; set; }
 
         public string name { get; set; }
         public int category { get; set; }
