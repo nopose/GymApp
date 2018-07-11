@@ -43,8 +43,10 @@ namespace GymApp.Models
 
         public ExercisesViewModel()
         {
-            var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=20&language=2&status=2");
+            var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
             Exercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
+
+            //Exercises.results = Exercises.results.OrderBy(x => x.category).ToList();
 
             json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/?limit=1000");
             ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
@@ -78,8 +80,21 @@ namespace GymApp.Models
                 }
             }
         }
+    }
 
+    public class ExerciseDetailViewModel
+    {
+        public Result<ExerciseInfo> Exercise { get; set; }
+        public Result<ExerciseImage> ExerciseImages { get; set; }
 
+        public ExerciseDetailViewModel(int id)
+        {
+            var json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseinfo/" + id);
+            Exercise = JsonConvert.DeserializeObject<Result<ExerciseInfo>>(json);
+
+            json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/?exercise=" + id);
+            ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
+        }
     }
     #endregion
 }

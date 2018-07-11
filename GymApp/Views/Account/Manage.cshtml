@@ -20,7 +20,7 @@
             <div class="card-header">Personnal Information</div>
             <div class="card-body">
                 <section>
-                    @using (Html.BeginForm("Personal", "Account", FormMethod.Post, new { }))
+                    @using (Html.BeginForm("Personal", "Account", FormMethod.Post, new { id = "personalInfoForm" }))
                     {
                         <input id="id" asp-for="UserID" hidden value="@user.Id" />
                         <h4>Manage your personnal information.</h4>
@@ -116,5 +116,29 @@
 </div>
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    @*<script type="text/javascript">
+        $("#personalInfoForm").on("submit", function (event) { 
+            $.ajax({
+                type: "POST",
+                url: "@(Url.Action("Manage", "Account"))",
+                datatype: "json",
+                cache: false,
+                data: { userID: @user.Id, firstName: $("#FirstName").val, lastName: $("#LastName").val, email: $("#Email").val},
+                success: function (data) {
+                    alert("hello")
+                    $("#FirstName").val(data.firstName);
+                    $("#LastName").val(data.lastName);
+                    $("#Email").val(data.email);
+                }
+                //error: function (data) {
+                //    for (var i = 0; i < response.errors.length; i++) {
+                //        var error = ko.mapping.fromJS(response.errors[i]);
+                //        self.saveErrors.push(error);
+                //    }
+                //}
+            });
+        });
+    </script>*@
 }
 
