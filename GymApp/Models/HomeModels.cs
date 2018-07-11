@@ -39,14 +39,18 @@ namespace GymApp.Models
     {
         public Result<Exercise> Exercises { get; set; }
         public Result<ExerciseImage> ExerciseImages { get; set; }
+        public Result<Category> Categories { get; set; }
 
         public ExercisesViewModel()
         {
             var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=20&language=2&status=2");
             Exercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
 
-            json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/");
+            json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/?limit=1000");
             ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
+
+            json = new WebClient().DownloadString("https://wger.de/api/v2/exercisecategory/");
+            Categories = JsonConvert.DeserializeObject<Result<Category>>(json);
 
             foreach (ExerciseImage im in ExerciseImages.results)
             {
