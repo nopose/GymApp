@@ -22,23 +22,23 @@
                 <section>
                     @using (Html.BeginForm("Personal", "Account", FormMethod.Post, new { }))
                     {
-                        <input asp-for="UserID" hidden value="@user.Id" />
+                        <input id="id" asp-for="UserID" hidden value="@user.Id" />
                         <h4>Manage your personnal information.</h4>
                         <hr />
                         <div asp-validation-summary="All" class="text-danger"></div>
                         <div class="form-group col-md-12">
                             <label asp-for="FirstName"></label>
-                            <input asp-for="FirstName" class="form-control" value="@user.FirstName" />
+                            <input id="fname" asp-for="FirstName" class="form-control" value="@user.FirstName" />
                             <span asp-validation-for="FirstName" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-12">
                             <label asp-for="LastName"></label>
-                            <input asp-for="LastName" class="form-control" value="@user.LastName" />
+                            <input id="lname" asp-for="LastName" class="form-control" value="@user.LastName" />
                             <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
                         <div class="form-group col-md-12">
                             <label asp-for="Email"></label>
-                            <input asp-for="Email" class="form-control" value="@user.Email" />
+                            <input id="email" asp-for="Email" class="form-control" value="@user.Email" />
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
                         <div class="form-group right col-md-6">
@@ -48,7 +48,70 @@
                 </section>
             </div>
         </div>
-       
+        <div class="card card-login mx-auto m-5 col-md-4">
+            <div class="card-header">health Information</div>
+            <div class="card-body">
+                <section>
+                    @using (Html.BeginForm("Physical", "Account", FormMethod.Post, new { }))
+                    {
+                        <input id="id" asp-for="UserID" hidden value="@user.Id" />
+                        <h4>Manage your physical information.</h4>
+                        <hr />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="Height"></label>
+                            <input asp-for="Height" class="form-control" value="@user.Height" />
+                            <span asp-validation-for="Height" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="Weight"></label>
+                            <input asp-for="Weight" class="form-control" value="@user.Weight" />
+                            <span asp-validation-for="Weight" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="Age"></label>
+                            <input asp-for="Age" class="form-control" value="@user.Age" />
+                            <span asp-validation-for="Age" class="text-danger"></span>
+                        </div>
+                        <div class="form-group right col-md-6">
+                            <button type="submit" class="btn btn-default">Save</button>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
+        <div class="card card-login mx-auto m-5 col-md-4">
+            <div class="card-header">Personnal Information</div>
+            <div class="card-body">
+                <section>
+                    @using (Html.BeginForm("Password", "Account", FormMethod.Post, new { }))
+                    {
+                        <input id="id" asp-for="UserID" hidden value="@user.Id" />
+                        <h4>Manage your password.</h4>
+                        <hr />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="OldPassword"></label>
+                            <input asp-for="OldPassword" class="form-control" />
+                            <span asp-validation-for="OldPassword" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="NewPassword"></label>
+                            <input asp-for="NewPassword" class="form-control" />
+                            <span asp-validation-for="NewPassword" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="ConfirmNewPassword"></label>
+                            <input asp-for="ConfirmNewPassword" class="form-control" />
+                            <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                        </div>
+                        <div class="form-group right col-md-6">
+                            <button type="submit" class="btn btn-default">Save</button>
+                        </div>
+                    }
+                </section>
+            </div>
+        </div>
     </div>
 </div>
 @section Scripts {

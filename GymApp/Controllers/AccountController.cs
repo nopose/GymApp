@@ -47,6 +47,12 @@ namespace GymApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Personal(ManageViewModel model, string returnUrl = null)
         {
+            ModelState.Remove("OldPassword");
+            ModelState.Remove("NewPassword");
+            ModelState.Remove("ConfirmNewPassword");
+            ModelState.Remove("Height");
+            ModelState.Remove("Weight");
+            ModelState.Remove("Age");
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
@@ -54,6 +60,7 @@ namespace GymApp.Controllers
 
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
+                user.UserName = model.Email;
                 user.Email = model.Email;
 
                 var result = await _userManager.UpdateAsync(user);
@@ -67,21 +74,47 @@ namespace GymApp.Controllers
             return View("Manage", model);
         }
 
-        /*[HttpPost]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Password(ManageViewModel model, string returnUrl = null)
+        {
+            ModelState.Remove("Height");
+            ModelState.Remove("Weight");
+            ModelState.Remove("Age");
+            ModelState.Remove("FirstName");
+            ModelState.Remove("LastName");
+            ModelState.Remove("Email");
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserID);
+
+                PasswordHasher<AppUser> ph = new PasswordHasher<AppUser>();
+                var passwordResult = ph.VerifyHashedPassword(user, user.PasswordHash, model.OldPassword);
+
+                if (passwordResult == PasswordVerificationResult.Success) {
+
+                    string resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                    var result = await _userManager.ResetPasswordAsync(user, resetToken, model.NewPassword);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToLocal(returnUrl);
+                    }
+                    AddErrors(result);
+                    return RedirectToLocal("Manage");
+                }
+            }
+            return View("Manage", model); ;
+        }
+
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Physical(ManageViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
             return View(model);
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Password(ManageViewModel model, string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View(model);
-        }*/
 
         [HttpPost]
         [AllowAnonymous]

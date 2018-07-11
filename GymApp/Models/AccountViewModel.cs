@@ -25,7 +25,7 @@ namespace GymApp.Models
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long. It must also contains at least one number and one capital letter.", MinimumLength = 8)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long. It must also contains at least one number, one capital letter, and 2 unique caracter.", MinimumLength = 8)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -74,7 +74,7 @@ namespace GymApp.Models
         public string Email { get; set; }
 
         // Password related information
-        /*[Required]
+        [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long. It must also contains at least one number and one capital letter.", MinimumLength = 8)]
         [DataType(DataType.Password)]
         [Display(Name = "Old Password")]
@@ -106,6 +106,6 @@ namespace GymApp.Models
         [Required]
         [Range(1, 100, ErrorMessage = "The age is required and must be between 1 and 100")]
         [Display(Name = "Age")]
-        public int Age { get; set; }*/
+        public int Age { get; set; }
     }
 }
