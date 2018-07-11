@@ -15,39 +15,40 @@
 }
 <h2>@ViewData["Title"]</h2>
 <div class="container">
-    <div class="card card-login mx-auto mt-5">
-        <div class="card-header">Login</div>
-        <div class="card-body">
-            <section>
-                <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
-                    <h4>Manage your personnal information.</h4>
-                    <hr />
-                    <div asp-validation-summary="All" class="text-danger"></div>
-                    <div class="row">
-                        <div class="form-group col-md-6">
+    <div class="row card-deck">
+        <div class="card card-login mx-auto m-5 col-md-4">
+            <div class="card-header">Personnal Information</div>
+            <div class="card-body">
+                <section>
+                    @using (Html.BeginForm("Personal", "Account", FormMethod.Post, new { }))
+                    {
+                        <input asp-for="UserID" hidden value="@user.Id" />
+                        <h4>Manage your personnal information.</h4>
+                        <hr />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group col-md-12">
                             <label asp-for="FirstName"></label>
                             <input asp-for="FirstName" class="form-control" value="@user.FirstName" />
                             <span asp-validation-for="FirstName" class="text-danger"></span>
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-12">
                             <label asp-for="LastName"></label>
                             <input asp-for="LastName" class="form-control" value="@user.LastName" />
                             <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
-                    </div>
-                    <div class="row">
                         <div class="form-group col-md-12">
                             <label asp-for="Email"></label>
                             <input asp-for="Email" class="form-control" value="@user.Email" />
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-default">Save Personal Information</button>
-                    </div>
-                </form>
-            </section>
+                        <div class="form-group right col-md-6">
+                            <button type="submit" class="btn btn-default">Save</button>
+                        </div>
+                    }
+                </section>
+            </div>
         </div>
+       
     </div>
 </div>
 @section Scripts {
