@@ -66,11 +66,14 @@ namespace GymApp.Controllers
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    return RedirectToLocal(returnUrl);
+                    TempData["SuccessMessage"] = "Congrats! Your personal information have been modified successfully!";
+                    return View("Manage", new ManageViewModel());
                 }
                 AddErrors(result);
-                return RedirectToLocal("Manage");
+                TempData["ErrorMessage"] = "Oops.. Something happened when modifying your personal information : " + result;
+                return View("Manage", model);
             }
+            TempData["ErrorMessage"] = "Oops.. Something went wrong...";
             return View("Manage", model);
         }
 
@@ -99,21 +102,49 @@ namespace GymApp.Controllers
                     var result = await _userManager.ResetPasswordAsync(user, resetToken, model.NewPassword);
                     if (result.Succeeded)
                     {
-                        return RedirectToLocal(returnUrl);
+                        TempData["SuccessMessage"] = "Congrats! Your password has been changed sucessfully!";
+                        return View("Manage", new ManageViewModel());
                     }
                     AddErrors(result);
-                    return RedirectToLocal("Manage");
+                    TempData["ErrorMessage"] = "Oops.. Something happened when modifying the passord : " + result;
+                    return View("Manage", model);
                 }
             }
-            return View("Manage", model); ;
+            TempData["ErrorMessage"] = "Oops.. Something went wrong...";
+            return View("Manage", model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Physical(ManageViewModel model, string returnUrl = null)
         {
+            ModelState.Remove("OldPassword");
+            ModelState.Remove("NewPassword");
+            ModelState.Remove("ConfirmNewPassword");
+            ModelState.Remove("FirstName");
+            ModelState.Remove("LastName");
+            ModelState.Remove("Email");
             ViewData["ReturnUrl"] = returnUrl;
-            return View(model);
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByIdAsync(model.UserID);
+
+                user.Age = model.Age;
+                user.Height = model.Height;
+                user.Weight = model.Weight;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    TempData["SuccessMessage"] = "Congrats! Your physical information have been modified successfully!";
+                    return View("Manage", new ManageViewModel());
+                }
+                AddErrors(result);
+                TempData["ErrorMessage"] = "Oops.. Something happened when modifying your physical information : " + result;
+                return View("Manage", model);
+            }
+            TempData["ErrorMessage"] = "Oops.. Something went wrong...";
+            return View("Manage", model);
         }
 
         [HttpPost]
