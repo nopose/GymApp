@@ -5,6 +5,11 @@
 @using Microsoft.AspNetCore.Http.Authentication
 @model LoginViewModel
 @inject SignInManager<AppUser> SignInManager
+
+@{
+    Layout = "_LayoutExterior";
+}
+
 @{
     ViewData["Title"] = "Log in";
 }
