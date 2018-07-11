@@ -27,14 +27,21 @@ namespace GymApp.Controllers
 
         public IActionResult Exercises(int startIndex = 0, int pageSize = 20)
         {
+            TempData["ErrorMessage"] = "BAD";
             ExercisesViewModel model = new ExercisesViewModel();
             return View(model);
         }
 
-        public IActionResult NavExercises(string query)
+        //public IActionResult NavExercises(string query)
+        //{
+        //    ExercisesViewModel model = new ExercisesViewModel(query);
+        //    return View("Exercises", model);
+        //}
+
+        public IActionResult ExerciseDetail(int id)
         {
-            ExercisesViewModel model = new ExercisesViewModel(query);
-            return View("Exercises", model);
+            ExerciseDetailViewModel model = new ExerciseDetailViewModel(id);
+            return View(model);
         }
 
         public IActionResult Error()

@@ -67,6 +67,29 @@ namespace GymApp.Controllers
             return View("Manage", model);
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> Manage(string userID, string firstName, string lastName, string email)
+        //{
+        //    //ViewData["ReturnUrl"] = returnUrl;
+        //    if (ModelState.IsValid)
+        //    {
+        //        var user = await _userManager.FindByIdAsync(userID);
+
+        //        user.FirstName = firstName;
+        //        user.LastName = lastName;
+        //        user.Email = email;
+
+        //        var result = await _userManager.UpdateAsync(user);
+        //        if (result.Succeeded)
+        //        {
+        //            return Json(new { firstName = firstName, lastName = lastName, email = email });
+        //        }
+        //        AddErrors(result);
+        //        return Json(new { firstName = firstName, lastName = lastName, email = email });
+        //    }
+        //    return Json(new { firstName = firstName, lastName = lastName, email = email });
+        //}
+
         /*[HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Physical(ManageViewModel model, string returnUrl = null)

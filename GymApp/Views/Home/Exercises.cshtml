@@ -25,59 +25,81 @@
 <h2>Exercises</h2>
 <div class="row">
     <ul class="nav nav-tabs">
+        @{var first = true;
+            var categoryId = 0;}
         @foreach (Category ca in Model.Categories.results)
         {
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#@ca.name">@ca.name</a>
-            </li>
+            if (first)
+            {
+                <li class="nav-item active">
+                    <a class="nav-link active" data-toggle="tab" aria-expanded="true" href="#@ca.name">@ca.name</a>
+                </li>
+                first = false;
+                categoryId = ca.id;
+            }
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#@ca.name">@ca.name</a>
+                </li>
+
+            }
         }
     </ul>
     <div class="tab-content">
-        <div class="tab-pane" id="Abs">
-            @foreach (Exercise ex in Model.Exercises.results)
+        @foreach (Category ca in Model.Categories.results)
+        {
+            if (ca.id == categoryId)
             {
-                <ul class="list-group media-list media-list-stream">
-                    <div class="col-12">
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <a>
-                                    <div class="row">
-                                        <div class="col-2">
-                                            @if (ex.imageURL != null)
-                                            {
-                                                <img style="max-width:100px; max-height:100px" class="card-img" src="@ex.imageURL" alt="@ex.name" />
-                                            }
-                                            else
-                                            {
-                                                <img style="max-width:100px; max-height:100px" class="card-img" src="~/images/dumbbellSVG.png" alt="@ex.name" />
-                                            }
-                                        </div>
-                                        <div class="col-10">
-                                            <h5 class="font-weight-bold">
-                                                @ex.name
-                                            </h5>
-                                            <p>
-                                                @Html.Raw(ex.description)
-                                            </p>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </ul>
+                
+             @:<div class="tab-pane active" id="@ca.name">
             }
-        </div>
+            else
+            {
+                
+            @:<div class="tab-pane" id="@ca.name">
+
+            }
+                @foreach (Exercise ex in Model.Exercises.results)
+                {
+                    if (ex.category == ca.id)
+                    {
+                        <ul class="list-group media-list media-list-stream">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <a>
+                                        <div class="row">
+                                            <div class="col-2">
+                                                @if (ex.imageURL != null)
+                                                {
+                                                    <img style="max-width:100px; max-height:100px" class="card-img" src="@ex.imageURL" alt="@ex.name" />
+                                                }
+                                                else
+                                                {
+                                                    <img style="max-width:100px; max-height:100px" class="card-img" src="~/images/dumbbellSVG.png" alt="@ex.name" />
+                                                }
+                                            </div>
+                                            <div class="col-10">
+                                                <h5 class="font-weight-bold">
+                                                    @ex.name
+                                                </h5>
+                                                <p>
+                                                    @Html.Raw(ex.description)
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </ul>
+                    }
+                }
+            @:</div>
+        }
     </div>
-    <div class="tab-content">
-        <div class="tab-pane" id="Arms">
-            <ul class="list-group media-list media-list-stream">hello</ul>
-        </div>
-    </div>
-    </div>
+</div>
 
 
-    @Html.ActionLink("Next page", "NavExercises", "Home", new { query = Model.Exercises.next }, new { @class = "btn btn-primary" })
-    <button id="next" type="button" class="btn btn-primary">Next</button>
+    @*@Html.ActionLink("Next page", "NavExercises", "Home", new { query = Model.Exercises.next }, new { @class = "btn btn-primary" })*@
 
 
