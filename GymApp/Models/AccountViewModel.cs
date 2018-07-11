@@ -96,12 +96,12 @@ namespace GymApp.Models
         [Required]
         [Range(55, 300, ErrorMessage = "The height is required, it must be between 55 and 300 centimeters (cm).")]
         [Display(Name = "Height (cm)")]
-        public string Height { get; set; }
+        public float Height { get; set; }
 
         [Required]
         [Range(60, 500, ErrorMessage = "The weight is required and must be between 60 and 500 pounds (lbs).")]
         [Display(Name = "Weight (lbs)")]
-        public int Weight { get; set; }
+        public float Weight { get; set; }
 
         [Required]
         [Range(1, 100, ErrorMessage = "The age is required and must be between 1 and 100")]

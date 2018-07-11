@@ -4,14 +4,16 @@ using GymApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GymApp.Migrations
 {
     [DbContext(typeof(GymAppContext))]
-    partial class GymAppContextModelSnapshot : ModelSnapshot
+    [Migration("20180711174321_InitialProgram-Exercise")]
+    partial class InitialProgramExercise
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
