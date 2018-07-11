@@ -1,9 +1,8 @@
-﻿<!--TODO change for template login-->
-@using System.Collections.Generic
+﻿@using System.Collections.Generic
 @using System.Linq
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Authentication
-@model ManageViewModel
+@model List<TrainingProgram>
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
 @{
@@ -16,7 +15,13 @@
 }
 <h2>@ViewData["Title"]</h2>
 <div class="container">
+    @if (Model.Count == 0)
+    {
+        <div>
+            <p>You don't have any programs right now....</p>
+        </div>
 
+    }
 </div>
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")

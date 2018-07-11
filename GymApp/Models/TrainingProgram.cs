@@ -28,8 +28,6 @@ namespace GymApp.Models
         public int id { get; set; }
 
         public int day { get; set; }
-        public int sets { get; set; }
-        public int rep { get; set; }
         public int ExerciseID { get; set; } // FROM API.
 
         public List<ExerciseSets> SetInfo { get; set; }

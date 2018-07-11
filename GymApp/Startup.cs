@@ -10,6 +10,7 @@ using GymApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using GymApp.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace GymApp
 {
