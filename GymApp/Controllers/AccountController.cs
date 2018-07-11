@@ -74,7 +74,7 @@ namespace GymApp.Controllers
             return View("Manage", model);
         }
 
-        /*[HttpPost]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Password(ManageViewModel model, string returnUrl = null)
         {

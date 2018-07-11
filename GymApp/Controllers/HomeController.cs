@@ -8,11 +8,19 @@ using GymApp.Models;
 using System.Net;
 using Newtonsoft.Json;
 using GymApp.APIModels;
+using GymApp.Data;
 
 namespace GymApp.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly GymAppContext _context;
+
+        public HomeController(GymAppContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
             return View(new DashboardViewModel());
@@ -27,15 +35,17 @@ namespace GymApp.Controllers
 
         public IActionResult Exercises(int startIndex = 0, int pageSize = 20)
         {
-            TempData["ErrorMessage"] = "BAD";
             ExercisesViewModel model = new ExercisesViewModel();
             return View(model);
         }
 
-        //public IActionResult NavExercises(string query)
+        //public string NavExercises()
         //{
-        //    ExercisesViewModel model = new ExercisesViewModel(query);
-        //    return View("Exercises", model);
+        //    string result = "";
+
+        //    var user = _context.Users.Find("5cd48358-8991-4359-9234-6f0d33354901");
+
+        //    return result;
         //}
 
         public IActionResult ExerciseDetail(int id)
