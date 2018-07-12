@@ -18,7 +18,11 @@
         });
     });
     </script>*@
-
+<style>
+    .fa {
+        color: #ffc107;
+    }
+</style>
 
 
 
@@ -67,9 +71,8 @@
                         <ul class="list-group media-list media-list-stream">
                             <ul class="list-group">
                                 <li class="list-group-item">
-                                    <a>
                                         <div class="row">
-                                            <div class="col-2">
+                                            <div class="col-md-2">
                                                 @if (ex.imageURL != null)
                                                 {
                                                     <img style="max-width:100px; max-height:100px" class="card-img" src="@ex.imageURL" alt="@ex.name" />
@@ -79,7 +82,7 @@
                                                     <img style="max-width:100px; max-height:100px" class="card-img" src="~/images/dumbbellSVG.png" alt="@ex.name" />
                                                 }
                                             </div>
-                                            <div class="col-10">
+                                            <div class="col-md-9">
                                                 <h5 class="font-weight-bold">
                                                     @ex.name
                                                 </h5>
@@ -87,8 +90,10 @@
                                                     @Html.Raw(ex.description)
                                                 </p>
                                             </div>
+                                            <div class="col-md-1">
+                                                <span data-toggle="tooltip" data-placement="top" title="More info about this Exercise">@Html.ActionLink("", "ExerciseDetail", "Home", new { id = ex.id }, new { @class = "fa fa-info-circle program" })</span>
+                                            </div>
                                         </div>
-                                    </a>
                                 </li>
                             </ul>
                         </ul>
