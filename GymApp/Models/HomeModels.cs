@@ -84,16 +84,17 @@ namespace GymApp.Models
 
     public class ExerciseDetailViewModel
     {
-        public Result<ExerciseInfo> Exercise { get; set; }
-        public Result<ExerciseImage> ExerciseImages { get; set; }
+        public ExerciseInfo exerciseInfo { get; set; }
+        public ExerciseImage exerciseImage { get; set; }
 
         public ExerciseDetailViewModel(int id)
         {
             var json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseinfo/" + id);
-            Exercise = JsonConvert.DeserializeObject<Result<ExerciseInfo>>(json);
+            exerciseInfo = JsonConvert.DeserializeObject<ExerciseInfo>(json);
 
             json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/?exercise=" + id);
-            ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
+            Result<ExerciseImage> ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
+            exerciseImage = ExerciseImages.results.FirstOrDefault();
         }
     }
     #endregion
