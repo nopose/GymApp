@@ -14,6 +14,8 @@ namespace GymApp.Data
     {
 
         public DbSet<TrainingProgram> Workouts { get; set; }
+        public DbSet<ProgramExercises> PExercises { get; set; }
+        public DbSet<ExerciseSets> ESets { get; set; }
         public DbSet<UserExercise> UserEx { get; set; }
 
         public GymAppContext(DbContextOptions<GymAppContext> options)
@@ -27,6 +29,8 @@ namespace GymApp.Data
 
             builder.Entity<TrainingProgram>().ToTable("Workouts");
             builder.Entity<UserExercise>().ToTable("UserEx");
+            builder.Entity<ProgramExercises>().ToTable("PExercises");
+            builder.Entity<ExerciseSets>().ToTable("ESets");
 
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.

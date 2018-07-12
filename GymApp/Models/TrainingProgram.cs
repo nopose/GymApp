@@ -19,7 +19,7 @@ namespace GymApp.Models
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
 
-        public List<ProgramExercises> Exercices { get; set; }
+        public List<ProgramExercises> Exercices { get; set; } = new List<ProgramExercises>();
     }
 
     public class ProgramExercises
@@ -30,7 +30,7 @@ namespace GymApp.Models
         public int day { get; set; }
         public int ExerciseID { get; set; } // FROM API.
 
-        public List<ExerciseSets> SetInfo { get; set; }
+        public List<ExerciseSets> SetInfo { get; set; } = new List<ExerciseSets>();
     }
 
     public class ExerciseSets

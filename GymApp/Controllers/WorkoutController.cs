@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -38,6 +39,31 @@ namespace GymApp.Controllers
 
             ViewBag.Exercises = ExercisesList;
             ViewBag.Workouts = workouts;
+            return View("Program");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> WorkoutInfo(int id, string returnUrl = null)
+        {
+            Dictionary<int, string> exerciseNames = new Dictionary<int, string>();
+
+            TrainingProgram program = await _context.Workouts.FirstOrDefaultAsync(W => W.id == id);
+            if (!(program is null))
+            {
+                foreach (var ex in program.Exercices)
+                {
+                    foreach (var real_ex in getExercisesFromAPI())
+                    {
+                        if (ex.ExerciseID == real_ex.id)
+                        {
+                            exerciseNames.Add(ex.ExerciseID, real_ex.name);
+                        }
+                    }
+                }
+                ViewBag.Names = exerciseNames;
+                return View("ProgramInfo", program);
+            }
+            TempData["ErrorMessage"] = "The program you've selected does not exist...";
             return View("Program");
         }
 
@@ -91,50 +117,64 @@ namespace GymApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddExerciseToWorkout(WorkoutViewModel model, string returnUrl = null)
+        public async Task<IActionResult> AddExerciseToWorkout(WorkoutViewModel model, string returnUrl = null)
         {
+            ModelState.Remove("WorkoutName");
+            ModelState.Remove("WorkoutDescription");
+            ModelState.Remove("StartDate");
+            ModelState.Remove("EndDate");
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
                 string userID = _userManager.GetUserId(User);
-                DateTime StartDate = model.StartDate;
-                DateTime EndDate = model.EndDate;
+                int programID = model.ProgramID;
+                int exerciseID = model.ExerciseID;
+                int day = model.Day;
+                int amount = model.Amount;
+                int aunit = model.Aunit;
+                int? weight = model.Weight;
+                int? wunit = model.Wunit;
 
-                TrainingProgram newProgram = new TrainingProgram();
-
-                if (!(StartDate >= new DateTime()))
+                if (weight != null && wunit < 1)
                 {
-                    TempData["ErrorMessage"] = "The StartDate must be greater or equal than today's date.";
+                    TempData["ErrorMessage"] = "If you enter a weight, you need to enter the weight unit as well.";
                     ViewBag.Exercises = ExercisesList;
                     ViewBag.Workouts = getWorkoutsForUser();
                     return View("Program", model);
                 }
-                if (!(EndDate > StartDate))
+
+                TrainingProgram tp = await _context.Workouts.FirstOrDefaultAsync(X => X.id == programID);
+                ExerciseSets e_set = new ExerciseSets
                 {
-                    TempData["ErrorMessage"] = "The StartDate must be greater than the EndDate";
-                    ViewBag.Exercises = ExercisesList;
-                    ViewBag.Workouts = getWorkoutsForUser();
-                    return View("Program", model);
-                }
+                    amount = amount,
+                    aunit = aunit,
+                    weight = (int) weight,
+                    wunit = (int) wunit
+                };
 
-                newProgram.uid = userID;
-                newProgram.name = model.WorkoutName;
-                newProgram.description = model.WorkoutDescription;
-                newProgram.StartDate = StartDate;
-                newProgram.EndDate = EndDate;
+                ProgramExercises p_ex = new ProgramExercises
+                {
+                    ExerciseID = exerciseID,
+                    day = day
+                };
 
-                _context.Workouts.Add(newProgram);
-                _context.SaveChanges();
+                p_ex.SetInfo.Add(e_set);
 
-                TempData["SuccessMessage"] = "Your new workout has been added successfully!";
+                tp.Exercices.Add(p_ex);
+
+
+                _context.Workouts.Update(tp);
+                await _context.SaveChangesAsync();
+
                 ViewBag.Exercises = ExercisesList;
                 ViewBag.Workouts = getWorkoutsForUser();
-                return View("Program");
+                TempData["SuccessMessage"] = "Congrats! Your exercise has been added successfully.";
+                return View("Program", new WorkoutViewModel());
             }
-            TempData["ErrorMessage"] = "Oops... Something went wrong..";
             ViewBag.Exercises = ExercisesList;
             ViewBag.Workouts = getWorkoutsForUser();
-            return View("Program");
+            TempData["ErrorMessage"] = "Oops... Something hapenned...";
+            return View("Program", model);
         }
 
         private List<TrainingProgram> getWorkoutsForUser()

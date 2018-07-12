@@ -24,6 +24,9 @@
         color: #ffc107;
         text-shadow: 1px 1px 1px #ccc;
         font-size: 1.5em;
+        text-decoration:underline;
+        text-decoration-style:solid;
+        text-decoration-color: #ffc107;
     }
 </style>
 <h2>@ViewData["Title"]</h2>
@@ -59,10 +62,10 @@
                             <p class="card-text">End Date : @item.EndDate.ToLongDateString()</p>
                         </div>
                         <div class="col-md-1 text-center">
-                            <a id="@item.id" data-toggle="modal" data-target="#AddExerciseModal"><span data-toggle="tooltip" data-placement="top" title="Add Exercise to this Workout"><i class="fa fa-plus-circle program"></i></span></a>
+                            <a id="@item.id" onclick="getProgramID(@item.id);" data-toggle="modal" data-target="#AddExerciseModal"><span data-toggle="tooltip" data-placement="top" title="Add Exercise to this Workout"><i class="fa fa-plus-circle program"></i></span></a>
                         </div>
                         <div class="col-md-1">
-                            <span data-toggle="tooltip" data-placement="top" title="More about this Workout"><i class="fa fa-info-circle program"></i></span>
+                            <span data-toggle="tooltip" data-placement="top" title="More info about this Workout">@Html.ActionLink("", "WorkoutInfo", "Workout", new { id = item.id }, new { @class= "fa fa-info-circle program" })</span>
                         </div>
                     </div>
                 </div>
@@ -84,7 +87,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                @using (Html.BeginForm("AddWorkout", "Workout", FormMethod.Post, new { }))
+                @using (Html.BeginForm("AddWorkout", "Workout", FormMethod.Post, new { id = "AddWorkoutForm" }))
                 {
                 <div class="modal-body">
                     <input id="uid" asp-for="UserID" hidden value="@user.Id" />
@@ -128,75 +131,78 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                @using (Html.BeginForm("AddExerciseToWorkout", "Workout", FormMethod.Post, new { }))
+                @using (Html.BeginForm("AddExerciseToWorkout", "Workout", FormMethod.Post, new { id = "AddExerciseForm" }))
                 {
-                    <div class="modal-body">
-                        <input id="id" asp-for="UserID" hidden value="@user.Id" />
-                        <div asp-validation-summary="All" class="text-danger"></div>
-                        <div class="form-group col-md-12">
-                            <label asp-for="ExerciseID"></label>
-                            <select asp-for="ExerciseID" class="form-control js-example-basic-single">
-                                <option value="-1">Choose an Exercise..</option>
-                                @foreach (var item in exercises)
-                                {
-                                    <option value="@item.id">@item.name</option>
-                                }
-                            </select>
-                            <span asp-validation-for="ExerciseID" class="text-danger"></span>
+                <div class="modal-body">
+                    <input id="id" asp-for="UserID" hidden value="@user.Id" />
+                    <input id="pid" asp-for="ProgramID" hidden />
+                    <div asp-validation-summary="All" class="text-danger"></div>
+                    <div class="form-group col-md-12">
+                        <label asp-for="ExerciseID"></label>
+                        <select asp-for="ExerciseID" class="form-control js-example-basic-single">
+                            <option value="-1">Choose an Exercise..</option>
+                            @foreach (var item in exercises)
+                            {
+                                <option value="@item.id">@item.name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="ExerciseID" class="text-danger"></span>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label asp-for="Day"></label>
+                        <select asp-for="Day" class="form-control">
+                            <option value="0" selected>Choose from..</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                        </select>
+                        <span asp-validation-for="Day" class="text-danger"></span>
+                    </div>
+                    <div class="SetInfo form-row col-md-12">
+                        <div class="form-group col-md-3">
+                            <label asp-for="Amount"></label>
+                            <input type="number" min="0" asp-for="Amount" class="form-control" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
                         </div>
-                        <div class="form-group col-md-12">
-                            <label asp-for="Day"></label>
-                            <select asp-for="Day" class="form-control">
+                        <div class="form-group col-md-3">
+                            <label asp-for="Aunit"></label>
+                            <select asp-for="Aunit" class="form-control">
                                 <option value="0" selected>Choose from..</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
+                                <option value="1">Kilometers</option>
+                                <option value="2">Miles</option>
+                                <option value="3">Minutes</option>
+                                <option value="4">Repetitions</option>
                             </select>
-                            <span asp-validation-for="Day" class="text-danger"></span>
+                            <span asp-validation-for="Aunit" class="text-danger"></span>
                         </div>
-                        <div class="SetInfo form-row col-md-12">
-                            <div class="form-group col-md-3">
-                                <label asp-for="Amount"></label>
-                                <input type="number" min="0" asp-for="Amount" class="form-control" />
-                                <span asp-validation-for="Amount" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label asp-for="Aunit"></label>
-                                <select asp-for="Aunit" class="form-control">
-                                    <option value="0" selected>Choose from..</option>
-                                    <option value="1">Kilometers</option>
-                                    <option value="2">Miles</option>
-                                    <option value="3">Minutes</option>
-                                    <option value="4">Repetitions</option>
-                                </select>
-                                <span asp-validation-for="Aunit" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label asp-for="Weight"></label>
-                                <input type="number" asp-for="Weight" class="form-control" />
-                                <span asp-validation-for="Weight" class="text-danger"></span>
-                                <em style="font-size:80%;">Optional</em>
-                            </div>
-                            <div class="form-group col-md-3">
-                                <label asp-for="Wunit"></label>
-                                <select asp-for="Wunit" class="form-control">
-                                    <option value="0" selected>Choose from..</option>
-                                    <option value="1">Body Weight</option>
-                                    <option value="2">Kilograms</option>
-                                    <option value="3">Pounds</option>
-                                </select>
-                                <span asp-validation-for="Wunit" class="text-danger"></span>
-                                <em style="font-size:80%;">Optional</em>
-                            </div>
+                        <div class="form-group col-md-3">
+                            <label asp-for="Weight"></label>
+                            <input type="number" asp-for="Weight" class="form-control" />
+                            <span asp-validation-for="Weight" class="text-danger"></span>
+                            <em style="font-size:80%;">Optional</em>
                         </div>
-                        <div class="form-row col-md-12 text-center">
-                            <em style="font-size:90%;">If you want to add more statistics to this exercise, you can do it in the program information.</em>
+                        <div class="form-group col-md-3">
+                            <label asp-for="Wunit"></label>
+                            <select asp-for="Wunit" class="form-control">
+                                <option value="0" selected>Choose from..</option>
+                                <option value="1">Body Weight</option>
+                                <option value="2">Kilograms</option>
+                                <option value="3">Pounds</option>
+                            </select>
+                            <span asp-validation-for="Wunit" class="text-danger"></span>
+                            <em style="font-size:80%;">Optional</em>
                         </div>
                     </div>
+                    <div class="form-row col-md-12 text-center">
+                        <em style="font-size:90%;">If you want to add more statistics to this exercise, you can do it 
+                        in the program information. Those "first statistics" allow us to set a base for your account 
+                        (e.g. It's your current maximum for this exercise).</em>
+                    </div>
+                </div>
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
@@ -214,6 +220,22 @@
     <script>
         $("#CreateProgramModal").on("shown.bs.modal", function () {
             $("#WorkoutName").trigger('focus');
+        });
+
+        function getProgramID(pid) {
+            document.getElementById('pid').value = pid;
+        };
+
+        $("#CreateProgramModal").on("hidden.bs.modal", function () {
+            $("#AddWorkoutForm").trigger("reset");
+            $("#AddWorkoutForm").find(".validation-summary-valid ul").html("");
+            $("#AddWorkoutForm").find(".field-validation-valid").empty();
+        });
+
+        $("#AddExerciseModal").on("hidden.bs.modal", function () {
+            $("#AddExerciseForm").trigger("reset");
+            $("#AddExerciseForm").find(".validation-summary-valid ul").html("");
+            $("#AddExerciseForm").find(".field-validation-valid").empty();
         });
     </script>
 
