@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html id="homePageBackground" class="h-100">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -15,15 +15,11 @@
     <link href="~/style/css/sb-admin.css" rel="stylesheet">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
 </head>
-<body>
+<body id="homePageBody" class="h-100" style="background-color:transparent;">
     <!-- Navigation-->
     @*@Html.Partial("SuccessMessage")*@
-    <div class="container body-content" style="padding-top:5%">
+    <div class="container body-content h-100" style="padding-top:5%">
         @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; 2018 - GymApp</p>
-        </footer>
     </div>
 
     <environment include="Development">
@@ -58,3 +54,4 @@
     <script src="~/js/manage.js"></script>
 </body>
 </html>
+

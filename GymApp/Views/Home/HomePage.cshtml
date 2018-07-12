@@ -1,0 +1,16 @@
+﻿@{
+    Layout = "_EmptyLayout";
+}
+<div class="container h-50" style="margin-top:32%;">
+    <div class="row w-100 text-center">
+        <div class="col-md-12">
+            <h1 id="homeTitle" class="display-3 text-white font-weight-bold">Welcome to GymApp!</h1>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-12" style="padding-top:3%;">
+            @Html.ActionLink("Visualize our exercises!", "Exercises", "Home", null, new { @class = "btn btn-primary col-md-4", style="margin: 0.5rem" })
+            @Html.ActionLink("Register now !", "Register", "Account", null, new { @class = "btn btn-primary col-md-4", style = "margin: 0.5rem" })
+        </div>
+    </div>
+</div>
