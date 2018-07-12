@@ -48,6 +48,9 @@ namespace GymApp.Controllers
             Dictionary<int, string> exerciseNames = new Dictionary<int, string>();
 
             TrainingProgram program = await _context.Workouts.FirstOrDefaultAsync(W => W.id == id);
+
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList();
+
             if (!(program is null))
             {
                 foreach (var ex in program.Exercices)
