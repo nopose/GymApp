@@ -25,6 +25,11 @@ html {
     opacity: 0.8;
 }
 
+#homeTitle {
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: darkslategrey;
+}
+
 #homePageBody {
     position: relative;
     z-index: 2;
