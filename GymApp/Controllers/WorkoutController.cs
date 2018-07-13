@@ -51,9 +51,11 @@ namespace GymApp.Controllers
         {
             Dictionary<int, string> exerciseNames = new Dictionary<int, string>();
 
-            TrainingProgram program = await _context.Workouts.FirstOrDefaultAsync(W => W.id == id);
+            TrainingProgram program = await _context.Workouts.FirstOrDefaultAsync(W => W.id == id && W.uid == _userManager.GetUserId(User));
 
-            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList();
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
 
             if (!(program is null))
             {
@@ -67,11 +69,46 @@ namespace GymApp.Controllers
                         }
                     }
                 }
+                ViewBag.Program = program;
                 ViewBag.Names = exerciseNames;
-                return View("ProgramInfo", program);
+                return View("ProgramInfo", new WorkoutViewModel());
             }
             TempData["ErrorMessage"] = "The program you've selected does not exist...";
             return View("Program");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddSets([FromBody]WorkoutViewModel data)
+        {
+            TrainingProgram tp =  _context.Workouts.FirstOrDefault(W => W.id == data.ProgramID);
+
+            int? weight = 0;
+
+            if (!(data.Weight == null)) { weight = data.Weight; }
+
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+            ProgramExercises p_ex = tp.Exercices.FirstOrDefault(E => E.id == data.ExerciseID);
+
+            List<ExerciseSets> e_set = p_ex.SetInfo;
+            ExerciseSets newSet = new ExerciseSets
+            {
+                amount = data.Amount,
+                aunit = data.Aunit,
+                weight = (int) weight,
+                wunit = (int) data.Wunit
+            };
+
+            p_ex.SetInfo.Add(newSet);
+
+            tp.Exercices.Add(p_ex);
+
+            _context.Workouts.Update(tp);
+            _context.SaveChanges();
+            return Json("Success.");
         }
 
         [HttpPost]
@@ -173,7 +210,6 @@ namespace GymApp.Controllers
                 p_ex.SetInfo.Add(e_set);
 
                 tp.Exercices.Add(p_ex);
-
 
                 _context.Workouts.Update(tp);
                 await _context.SaveChangesAsync();
