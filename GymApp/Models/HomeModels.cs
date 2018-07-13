@@ -40,19 +40,17 @@ namespace GymApp.Models
         public Result<Exercise> Exercises { get; set; }
         public Result<ExerciseImage> ExerciseImages { get; set; }
         public Result<Category> Categories { get; set; }
+        public string Search { get; set; }
 
         public ExercisesViewModel()
         {
-            var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
-            Exercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
+            Exercises = getAllExercises();
 
             //Exercises.results = Exercises.results.OrderBy(x => x.category).ToList();
 
-            json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/?limit=1000");
-            ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
+            ExerciseImages = getAllExercisesImages();
 
-            json = new WebClient().DownloadString("https://wger.de/api/v2/exercisecategory/");
-            Categories = JsonConvert.DeserializeObject<Result<Category>>(json);
+            Categories = getAllCategories();
 
             foreach (ExerciseImage im in ExerciseImages.results)
             {
@@ -63,22 +61,58 @@ namespace GymApp.Models
             }
         }
 
-        public ExercisesViewModel(string query)
+        //public ExercisesViewModel(string query)
+        //{
+        //    var json = new WebClient().DownloadString(query);
+        //    Exercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
+
+        //    json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/");
+        //    ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
+
+        //    foreach (ExerciseImage im in ExerciseImages.results)
+        //    {
+        //        Exercise ex = Exercises.results.Find(x => x.id == im.id);
+        //        if (ex != null)
+        //        {
+        //            ex.imageURL = im.image;
+        //        }
+        //    }
+        //}
+
+        public ExercisesViewModel(string search)
         {
-            var json = new WebClient().DownloadString(query);
-            Exercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
+            Search = search;
+            Exercises = getAllExercises();
+            ExerciseImages = getAllExercisesImages();
+            Categories = getAllCategories();
 
-            json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/");
-            ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
+            //int index = 0;
+            //for (int i = 0; i < Exercises.results.Count; i++)
+            //{
+            //    if (!(Exercises.results[index].name.ToUpper().Contains(search.ToUpper())))
+            //        Exercises.results.RemoveAt(index);
+            //    else
+            //        index++;
+            //}
+            Exercises.results.RemoveAll(x => !x.name.ToUpper().Contains(search.ToUpper()));
+        }
 
-            foreach (ExerciseImage im in ExerciseImages.results)
-            {
-                Exercise ex = Exercises.results.Find(x => x.id == im.id);
-                if (ex != null)
-                {
-                    ex.imageURL = im.image;
-                }
-            }
+        public Result<Exercise> getAllExercises()
+        {
+            var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
+            return JsonConvert.DeserializeObject<Result<Exercise>>(json);
+        }
+
+        public Result<ExerciseImage> getAllExercisesImages()
+        {
+            var json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/?limit=1000");
+            return JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
+        }
+
+        public Result<Category> getAllCategories()
+        {
+            var json = new WebClient().DownloadString("https://wger.de/api/v2/exercisecategory/");
+            return JsonConvert.DeserializeObject<Result<Category>>(json);
         }
     }
 

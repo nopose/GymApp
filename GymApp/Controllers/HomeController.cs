@@ -9,6 +9,7 @@ using System.Net;
 using Newtonsoft.Json;
 using GymApp.APIModels;
 using GymApp.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace GymApp.Controllers
 {
@@ -37,6 +38,12 @@ namespace GymApp.Controllers
         {
             ExercisesViewModel model = new ExercisesViewModel();
             return View(model);
+        }
+
+        public IActionResult SearchExercises(IFormCollection form)
+        {
+            ExercisesViewModel model = new ExercisesViewModel(Convert.ToString(form["search"]));
+            return View("Exercises", model);
         }
 
         //public string NavExercises()

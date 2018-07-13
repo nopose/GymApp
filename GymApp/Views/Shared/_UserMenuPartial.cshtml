@@ -5,26 +5,32 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Workouts">
-            <a class="nav-link" href="index.html">
-                <i class="fa fa-fw fa-table"></i>
-                <span class="nav-link-text">My Workouts</span>
-            </a>
-        </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Exercices Information">
-            <a class="nav-link" href="charts.html">
-                <i class="fa fa-fw fa-info-circle"></i>
-                <span class="nav-link-text">Exercices and Information</span>
-            </a>
-        </li>
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Calendar">
-            <a class="nav-link" href="tables.html">
-                <i class="fa fa-fw fa-calendar"></i>
-                <span class="nav-link-text">Calendar</span>
-            </a>
-        </li>
-    </ul>
+<ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="My Workouts">
+        <a class="nav-link" href="@Url.Action("Workouts", "Workout")">
+            <i class="fa fa-fw fa-table"></i>
+            <span class="nav-link-text">My Workouts</span>
+        </a>
+    </li>
+    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Exercises Information">
+        <a class="nav-link" href="@Url.Action("Exercises", "Home")">
+            <i class="fa fa-fw fa-heartbeat"></i>
+            <span class="nav-link-text">Exercises Information</span>
+        </a>
+    </li>
+    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Calendar">
+        <a class="nav-link" href="tables.html">
+            <i class="fa fa-fw fa-calendar"></i>
+            <span class="nav-link-text">Calendar</span>
+        </a>
+    </li>
+    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="How to use GymApp ">
+        <a class="nav-link" href="charts.html">
+            <i class="fa fa-fw fa-info-circle"></i>
+            <span class="nav-link-text">How to use GymApp</span>
+        </a>
+    </li>
+</ul>
     <ul class="navbar-nav sidenav-toggler">
         <li class="nav-item">
             <a class="nav-link text-center" id="sidenavToggler">

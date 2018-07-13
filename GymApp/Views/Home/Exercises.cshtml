@@ -19,14 +19,19 @@
     });
     </script>*@
 <style>
-    .fa {
-        color: #ffc107;
+    .orange {
+        color: #ffc107 !important;
     }
 </style>
 
 
 
 <h2>Exercises</h2>
+@if(Model.Search != null)
+{
+    string s = "Search result for: \"" + Model.Search + "\"";
+    <h3>@s</h3>
+}
 <div class="row">
     <ul class="nav nav-tabs">
         @{var first = true;
@@ -91,7 +96,7 @@
                                                 </p>
                                             </div>
                                             <div class="col-md-1">
-                                                <span data-toggle="tooltip" data-placement="top" title="More info about this Exercise">@Html.ActionLink("", "ExerciseDetail", "Home", new { id = ex.id }, new { @class = "fa fa-info-circle program" })</span>
+                                                <span data-toggle="tooltip" data-placement="top" title="More info about this Exercise">@Html.ActionLink("", "ExerciseDetail", "Home", new { id = ex.id }, new { @class = "fa fa-info-circle program orange" })</span>
                                             </div>
                                         </div>
                                 </li>
