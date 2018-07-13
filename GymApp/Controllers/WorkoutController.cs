@@ -10,6 +10,7 @@ using GymApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 
 namespace GymApp.Controllers
@@ -19,16 +20,19 @@ namespace GymApp.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly GymAppContext _context;
+        private IMemoryCache _cache;
         public List<Exercise> ExercisesList { get; set; }
 
         public WorkoutController(
                     UserManager<AppUser> userManager,
                     SignInManager<AppUser> signInManager,
-                    GymAppContext context)
+                    GymAppContext context,
+                    IMemoryCache cache)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _context = context;
+            _cache = cache;
             ExercisesList = getExercisesFromAPI();
         }
 
@@ -74,6 +78,11 @@ namespace GymApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddWorkout(WorkoutViewModel model, string returnUrl = null)
         {
+            ModelState.Remove("ExerciseID");
+            ModelState.Remove("Day");
+            ModelState.Remove("Amount");
+            ModelState.Remove("Aunit");
+
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
@@ -83,16 +92,16 @@ namespace GymApp.Controllers
 
                 TrainingProgram newProgram = new TrainingProgram();
 
-                if (!(StartDate >= new DateTime()))
+                if (!(StartDate.Date >= DateTime.Now.Date))
                 {
-                    TempData["ErrorMessage"] = "The StartDate must be greater or equal than today's date.";
+                    TempData["ErrorMessage"] = "The Start Date must be greater or equal than today's date.";
                     ViewBag.Exercises = ExercisesList;
                     ViewBag.Workouts = getWorkoutsForUser();
                     return View("Program", model);
                 }
                 if (!(EndDate > StartDate))
                 {
-                    TempData["ErrorMessage"] = "The StartDate must be greater than the EndDate";
+                    TempData["ErrorMessage"] = "The Start Date must be greater than the End Date";
                     ViewBag.Exercises = ExercisesList;
                     ViewBag.Workouts = getWorkoutsForUser();
                     return View("Program", model);
@@ -199,9 +208,18 @@ namespace GymApp.Controllers
 
         private List<Exercise> getExercisesFromAPI()
         {
-            var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
-            var Exercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
-            return Exercises.results;
+            Result<Exercise> cacheExercises;
+
+            if (!(_cache.TryGetValue("Exercises", out cacheExercises)))
+            {
+                var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
+                cacheExercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
+
+                // Save data in cache.
+                _cache.Set("Exercises", cacheExercises.ShallowCopy());
+            }
+
+            return cacheExercises.results;
         }
     }
 }

@@ -13,6 +13,12 @@ namespace GymApp.APIModels
         public string next { get; set; }
         public string previous { get; set; }
         public List<T> results { get; set; }
+
+
+        public Result<T> ShallowCopy()
+        {
+            return (Result<T>)this.MemberwiseClone();
+        }
     }
 
     public class Category

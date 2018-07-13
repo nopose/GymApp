@@ -37,14 +37,14 @@ namespace GymApp.Models
         public int ExerciseID { get; set; }
 
         [Display(Name = "Day of workouk (1-7)")]
-        [Range(1, 7, ErrorMessage = "The day represent a day of the week, so it must be a value of 1 to 7 both included.")]
+        [Range(1, 7, ErrorMessage = "The day represent a day of the week, so it must be a value between 1 and 7 included.")]
         public int Day { get; set; }
 
         [Display(Name = "Amount")]
         public int Amount { get; set; }
 
         [Display(Name = "Unit")]
-        [Range(1, 4, ErrorMessage = "You need to select the type of amount that you've entered.")]
+        [Range(1, 4, ErrorMessage = "You need to select the unit for the amount that you've entered.")]
         public int Aunit { get; set; }
 
         [Display(Name = "Weight")]

@@ -34,35 +34,38 @@
         {
             if (i == 1)
             {
-                @:<div class="tab-pane active" id="day1" >
-            }
-            else
-            {
-                @:<div class="tab-pane" id="day@(i)"i  >
-            }
-            @foreach (var ex in Model.Exercices)
-            {
-                if (ex.day == i)
+                @:<div class="tab-pane active" id="day1">
+                }
+                else
                 {
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="form-group col-md-6">
-                                    <h5 class="card-title">@names.GetValueOrDefault(ex.ExerciseID)</h5>
-                                </div>
-                                <div class="form-group col-md-3">
-                                    <p>Button to add SET.</p>
-                                </div>
-                                <div class="form-group col-md-3">
-                                    <p>Button to delete EX.</p>
+                    @:<div class="tab-pane" id="day@(i)" i>
+                    }
+                    @foreach (var ex in Model.Exercices)
+                    {
+                        if (ex.day == i)
+                        {
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <h5 class="card-title">@names.GetValueOrDefault(ex.ExerciseID)</h5>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <p>Button to add SET.</p>
+                                        </div>
+                                        <div class="form-group col-md-3">
+                                            <p>Button to delete EX.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                }
+                        }
+                    }
+                @:</div>
             }
-            @:</div>
-        }
+    </div>
+    <div class="row" style="margin-top:10%;">
+        @Html.ActionLink("Back to workouts", "Workouts", "Workout", null, new { @class = "btn btn-primary col-md-3" })
     </div>
 </div>
 @section Scripts {

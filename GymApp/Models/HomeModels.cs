@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GymApp.APIModels;
+using Microsoft.AspNetCore.Http;
 
 namespace GymApp.Models
 {
@@ -38,27 +39,31 @@ namespace GymApp.Models
     public class ExercisesViewModel
     {
         public Result<Exercise> Exercises { get; set; }
+        //public List<Exercise> SearchedExercises { get; set; }
         public Result<ExerciseImage> ExerciseImages { get; set; }
         public Result<Category> Categories { get; set; }
         public string Search { get; set; }
 
-        public ExercisesViewModel()
+        public ExercisesViewModel(bool hasResult)
         {
-            Exercises = getAllExercises();
-
-            //Exercises.results = Exercises.results.OrderBy(x => x.category).ToList();
-
-            ExerciseImages = getAllExercisesImages();
-
-            Categories = getAllCategories();
-
-            foreach (ExerciseImage im in ExerciseImages.results)
+            if (!hasResult)
             {
-                Exercise ex = Exercises.results.Find(x => x.id == im.id);
-                if (ex != null) {
-                    ex.imageURL = im.image;
+                Exercises = getAllExercises();
+
+                //Exercises.results = Exercises.results.OrderBy(x => x.category).ToList();
+
+                ExerciseImages = getAllExercisesImages();
+
+                foreach (ExerciseImage im in ExerciseImages.results)
+                {
+                    Exercise ex = Exercises.results.Find(x => x.id == im.id);
+                    if (ex != null)
+                    {
+                        ex.imageURL = im.image;
+                    }
                 }
             }
+            Categories = getAllCategories();
         }
 
         //public ExercisesViewModel(string query)
@@ -79,22 +84,23 @@ namespace GymApp.Models
         //    }
         //}
 
-        public ExercisesViewModel(string search)
+        public ExercisesViewModel(bool hasResult, string search)
         {
             Search = search;
-            Exercises = getAllExercises();
-            ExerciseImages = getAllExercisesImages();
-            Categories = getAllCategories();
 
-            //int index = 0;
-            //for (int i = 0; i < Exercises.results.Count; i++)
-            //{
-            //    if (!(Exercises.results[index].name.ToUpper().Contains(search.ToUpper())))
-            //        Exercises.results.RemoveAt(index);
-            //    else
-            //        index++;
-            //}
-            Exercises.results.RemoveAll(x => !x.name.ToUpper().Contains(search.ToUpper()));
+            if (!hasResult)
+            {
+                Exercises = getAllExercises();
+                ExerciseImages = getAllExercisesImages();
+            }
+            Categories = getAllCategories();
+        }
+
+        public void doSearch()
+        {
+            List<Exercise> copy = Exercises.results.ToList();
+            copy.RemoveAll(x => !x.name.ToUpper().Contains(Search.ToUpper()));
+            Exercises.results = copy;
         }
 
         public Result<Exercise> getAllExercises()
