@@ -2,70 +2,259 @@
 @using System.Linq
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Http.Authentication
-@model TrainingProgram 
+@model WorkoutViewModel 
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
 @{
-    ViewData["Title"] = "Program "+ Model.name +" Information";
+    TrainingProgram program = ViewBag.Program;
+    ViewData["Title"] = "Program " + program.name + " Information";
     AppUser user = null;
     Dictionary<int, string> names = ViewBag.Names;
+    Dictionary<int, string> aunits = new Dictionary<int, string>();
+    Dictionary<int, string> wunits = new Dictionary<int, string>();
+    aunits.Add(1, "Kilometers");
+    aunits.Add(2, "Miles");
+    aunits.Add(3, "Minutes");
+    aunits.Add(4, "Repetition");
+    wunits.Add(1, "Body Weight");
+    wunits.Add(2, "Kilograms");
+    wunits.Add(3, "Pounds");
     if (SignInManager.IsSignedIn(User))
     {
         user = await UserManager.GetUserAsync(User);
     }
 }
+<style>
+    #loading-indicator {
+        background-color:rgba(0, 0, 0, 0.7);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+    }
+</style>
 <h2>@ViewData["Title"]</h2>
 <hr />
 <div class="container">
+    @using (Html.BeginForm("AddSets", "Workout", FormMethod.Post, new { id = "AddSetsForm" }))
+    {
+    }
     <ul class="nav nav-tabs">
         <li class="nav-item active">
             <a class="nav-link active show" data-toggle="tab" aria-expanded="true" href="#day1">Day 1</a>
         </li>
         @for (int i = 2; i <= 7; i++)
-        { 
+        {
             <li class="nav-item">
                 <a class="nav-link" data-toggle="tab" href="#day@(i)">Day @i</a>
             </li>
         }
     </ul>
 
+    <input hidden id="ProgramCurrent" value="@program.id" />
     <div class="tab-content">
         @for (int i = 1; i <= 7; i++)
         {
             if (i == 1)
             {
-                @:<div class="tab-pane active" id="day1" >
-            }
-            else
-            {
-                @:<div class="tab-pane" id="day@(i)"i  >
-            }
-            @foreach (var ex in Model.Exercices)
-            {
-                if (ex.day == i)
+                @:<div class="tab-pane active" id="day1">
+                }
+                else
                 {
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="form-group col-md-6">
-                                    <h5 class="card-title">@names.GetValueOrDefault(ex.ExerciseID)</h5>
-                                </div>
-                                <div class="form-group col-md-3">
-                                    <p>Button to add SET.</p>
-                                </div>
-                                <div class="form-group col-md-3">
-                                    <p>Button to delete EX.</p>
+                    @:<div class="tab-pane" id="day@(i)" i>
+                    }
+                    @foreach (var ex in program.Exercices)
+                    {
+                        int j = 0;
+                        if (ex.day == i)
+                        {
+                            <div class="card" style="margin-bottom:1%; margin-top:1%;">
+                                <div class="card-header">
+                                    <div class="row card-group">
+                                        <div class="form-group col-md-10">
+                                            <h5 class="card-title">@names.GetValueOrDefault(ex.ExerciseID)</h5>
+                                        </div>
+                                        <div class="form-group col-md-1">
+                                            <a class="nav-link" data-toggle="collapse" href="#set@(ex.ExerciseID)">
+                                                <i class="fa fa-fw fa-expand" data-toggle="tooltip" data-placement="top" title="Open Sets information"></i>
+                                            </a>
+                                        </div>
+                                        <div class="form-group col-md-1" style="padding-right:1%;">
+                                            <a class="nav-link" href="#">
+                                                <i class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Exercise "></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="collapse" id="set@(ex.ExerciseID)">
+                                        <div class="card card-body">
+                                            <table id="ExerciseTable" tag="@(ex.id)" class="table table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Amount</th>
+                                                        <th scope="col">Unit</th>
+                                                        <th scope="col">Weight</th>
+                                                        <th scope="col">Unit</th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var set in ex.SetInfo)
+                                                    {
+                                                        @using (Html.BeginForm("AddSets", "Workout", FormMethod.Post, new { id = "AddSetsTo" }))
+                                                        {
+                                                            <tr>
+                                                                <td>@set.amount</td>
+                                                                <td>@aunits.GetValueOrDefault(set.aunit)</td>
+                                                                <td>@set.weight</td>
+                                                                <td>@wunits.GetValueOrDefault(set.wunit)</td>
+                                                                <td>
+                                                                    <a class="saveRow"></a>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="removeRow"></a>
+                                                                </td>
+                                                            </tr>
+                                                            <div class="SuccessIF text-success"></div>
+                                                            <div class="ErrorIf text-danger"></div>
+                                                        }
+                                                    }
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="5" style="text-align: left;">
+                                                            <input type="button" class="btn btn-lg btn-block btn-primary addrow" value="Add Row" />
+                                                        </td>
+                                                    </tr>
+                                                    <tr></tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                }
+                        }
+                    }@:</div>
             }
-            @:</div>
-        }
     </div>
 </div>
+<div class="mymodal"><img src="~/images/45.gif" id="loading-indicator" style="display:none" /></div>
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
+
+
+    <script>
+
+        $(document).ready(function () {
+            var counter = 0;
+
+            $(".addrow").on("click", function () {
+                var newRow = $("<tr>");
+                var cols = "";
+
+                cols += '<td id="amount' + counter + '"><input type="number" placeholder="Enter a number" class="form-control" id="iamount' + counter + '"/></td>';
+                cols += '<td id="aunit' + counter + '"><select class="form-control" id="iaunit' + counter + '"><option value="0" selected>Choose from..</option><option value="1">Kilometers</option><option value="2">Miles</option><option value="3">Minutes</option><option value="4">Repetition</option></select></td>';
+                cols += '<td id="weight' + counter + '"><input type="number" placeholder="Enter a number" class="form-control" id="iweight' + counter + '"/></td>';
+                cols += '<td id="wunit' + counter + '"><select class="form-control" id="iwunit' + counter + '"><option value="0" selected>Choose from..</option><option value="1">Body Weight</option><option value="2">Kilograms</option><option value="3">Pounds</option></select></td>';
+
+                cols += '<td><button type="button" class="ibtnSave btn-success" data-href="addMyNewSet();" data-toggle="modal" data-target="#confirm-adding"><span class="fa fa-check-circle"></span></button>' +
+                    '   <button type="button" class="ibtnRem btn-danger" aria-label="Close"> <span class="fa fa-times-circle"></span></button ></td > ';
+                newRow.append(cols);
+                $(this).closest("table.table-striped").append(newRow);
+                counter++;
+            });
+
+            $("table.table-striped").on("click", ".ibtnRem", function (event) {
+                $(this).closest("tr").remove();
+                counter -= 1
+            });
+
+            $("table.table-striped").on("click", ".ibtnSave", function (event) {
+                $(this).closest(".ErrorIf").html("").hide();
+                $(this).closest(".SuccessIf").html("").hide();
+                var amount = document.getElementById("iamount" + (counter - 1)).value;
+                var aunit = document.getElementById("iaunit" + (counter - 1)).value;
+                var weight = document.getElementById("iweight" + (counter - 1)).value;
+                var wunit = document.getElementById("iwunit" + (counter - 1)).value;
+                var ProgramID = $("#ProgramCurrent").val().toString();
+                var ExerciseID = $(this).closest("#ExerciseTable").attr("tag").toString();
+
+                var json = JSON.stringify({
+                    'ProgramID': ProgramID,
+                    'ExerciseID': ExerciseID,
+                    'Amount': amount.toString(),
+                    'Aunit': aunit.toString(),
+                    'Weight': weight.toString(),
+                    'Wunit': wunit.toString()
+                });
+
+                console.log(json);
+
+                if (amount != "" || amount > 0) {
+                    if (aunit > 0) {
+                        if ((weight > 0 && wunit > 0) || weight == "") {
+
+                            if (weight == "") { weight = "N/A"; }
+
+                            $('#loading-indicator').show();
+
+                            $.ajax({
+                                url: "/workout/AddSets",
+                                type: "POST",
+                                headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                                contentType: "application/json; charset=utf-8",
+                                dataType: "json",
+                                data: json,
+                                success: function (data) {
+
+                                    $('#loading-indicator').hide();
+
+                                    $('td#aunit' + (counter - 1)).empty();
+                                    $('td#wunit' + (counter - 1)).empty();
+                                    $('td#amount' + (counter - 1)).html(amount);
+                                    $('td#aunit' + (counter - 1)).html(getStringForUnit("a", aunit, wunit));
+                                    $('td#weight' + (counter - 1)).html(weight);
+                                    $('td#wunit' + (counter - 1)).html(getStringForUnit("w", aunit, wunit));
+
+                                    $(this).closest(".ErrorIf").html("").hide();
+                                    $(this).closest(".SuccessIf").html("Congrats! Your stats have been added to this workout successfully!").show();
+                                    setTimeout(function () {
+                                        $(this).closest(".SuccessIf").fadeOut().empty();
+                                    }, 5000);
+                                },
+                                error: function () {
+                                    console.log("Something happened...");
+                                }
+                            });
+
+                            $(this).remove();
+                            $(".ibtnRem").remove();
+
+                        } else { $(this).closest(".ErrorIf").html("The weight can't be 0 and if it's greater than 0 the amount needs to be chosen as well...").show(); }
+                    } else { $(this).closest(".ErrorIf").html("The unit for the amount needs to be chosen...").show(); }
+                } else {
+                    $(this).closest(".ErrorIf").html("The amount needs to be entered...");
+                    $(this).closest(".ErrorIf").show();
+                }
+            });
+        });
+
+        function getStringForUnit(unit, aunit, wunit) {
+            var answer = "";
+            if (unit === "a") {
+                if (aunit == 1) { answer = "Kilometers"; }
+                else if (aunit == 2) { answer = "Miles"; }
+                else if (aunit == 3) { answer = "Minutes"; }
+                else if (aunit == 4) { answer = "Repetition"; }
+
+            } else if (unit === "w") {
+                if (wunit == 0) { answer = "N/A"; }
+                else if (wunit == 1) { answer = "Body Weight"; }
+                else if (wunit == 2) { answer = "Kilograms"; }
+                else if (wunit == 3) { answer = "Pounds"; }
+
+            }
+            return answer;
+        }
+    </script>
 }
 
