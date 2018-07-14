@@ -108,45 +108,30 @@ namespace GymApp.Controllers
 
             tp.Exercices.Add(p_ex);
 
-            _context.Workouts.Update(tp);
+            var result = _context.Workouts.Update(tp);
+            _context.SaveChanges();
+
+            var setResult = result.Entity.Exercices.FirstOrDefault(x => x.id == data.ExerciseID).SetInfo.Last();
+            setResult = _context.ESets.FirstOrDefault(x => x.id == setResult.id);
+
+            return Json(JsonConvert.SerializeObject(setResult));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteSet([FromBody]WorkoutViewModel data)
+        {
+            TrainingProgram tp = _context.Workouts.FirstOrDefault(W => W.id == data.ProgramID);
+
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+            
+            ExerciseSets toDelete = sets.FirstOrDefault(x => x.id == data.SetID);
+            _context.ESets.Remove(toDelete);
             _context.SaveChanges();
             return Json("Success.");
         }
-
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult DeleteSets([FromBody]WorkoutViewModel data)
-        //{
-        //    TrainingProgram tp = _context.Workouts.FirstOrDefault(W => W.id == data.ProgramID);
-
-        //    int? weight = 0;
-
-        //    if (!(data.Weight == null)) { weight = data.Weight; }
-
-        //    var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
-
-        //    var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
-
-        //    ProgramExercises p_ex = tp.Exercices.FirstOrDefault(E => E.id == data.ExerciseID);
-
-        //    _context.ESets.FromSql("DELETE FROM ESets WHERE id=''");
-
-        //    ExerciseSets newSet = new ExerciseSets
-        //    {
-        //        amount = data.Amount,
-        //        aunit = data.Aunit,
-        //        weight = (int)weight,
-        //        wunit = (int)data.Wunit
-        //    };
-
-        //    p_ex.SetInfo.Add(newSet);
-
-        //    tp.Exercices.Add(p_ex);
-
-        //    _context.Workouts.Update(tp);
-        //    _context.SaveChanges();
-        //    return Json("Success.");
-        //}
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -260,6 +245,29 @@ namespace GymApp.Controllers
             ViewBag.Workouts = getWorkoutsForUser();
             TempData["ErrorMessage"] = "Oops... Something hapenned...";
             return View("Program", model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteExercise([FromBody]WorkoutViewModel data)
+        {
+            TrainingProgram tp = _context.Workouts.FirstOrDefault(W => W.id == data.ProgramID);
+
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+            ExerciseSets setToDelete;
+            foreach (var s in sets)//this delete the whole table oups
+            {
+                setToDelete = sets.FirstOrDefault(x => x.id == s.id);
+                _context.ESets.Remove(setToDelete);
+            }
+
+            ProgramExercises toDelete = exer.FirstOrDefault(x => x.id == data.ExerciseID);
+            _context.PExercises.Remove(toDelete);
+            _context.SaveChanges();
+            return Json("Success.");
         }
 
         private List<TrainingProgram> getWorkoutsForUser()

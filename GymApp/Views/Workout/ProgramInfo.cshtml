@@ -79,7 +79,7 @@
                                             </a>
                                         </div>
                                         <div class="form-group col-md-1" style="padding-right:1%;">
-                                            <a class="nav-link" href="#">
+                                            <a class="nav-link" onclick="exercisesDelete(@ex.id)">
                                                 <i class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Exercise "></i>
                                             </a>
                                         </div>
@@ -102,7 +102,7 @@
                                                     {
                                                         @using (Html.BeginForm("AddSets", "Workout", FormMethod.Post, new { id = "AddSetsTo" }))
                                                         {
-                                                            <tr>
+                                                            <tr id="@(set.id)">
                                                                 <td>@set.amount</td>
                                                                 <td>@aunits.GetValueOrDefault(set.aunit)</td>
                                                                 <td>@set.weight</td>
@@ -111,6 +111,7 @@
                                                                     <a class="saveRow"></a>
                                                                 </td>
                                                                 <td>
+                                                                    <i onclick="setDelete(@set.id)" class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this set"></i>
                                                                     <a class="removeRow"></a>
                                                                 </td>
                                                             </tr>
@@ -158,7 +159,7 @@
                 $(".addrow").hide();
                 $("#success").show();
                 $("#errorAdd").show();
-                var newRow = $("<tr>");
+                var newRow = $('<tr id="insert">');
                 var cols = "";
 
                 cols += '<td id="amount' + counter + '"><input type="number" placeholder="Enter a number" class="form-control" id="iamount' + counter + '"/></td>';
@@ -168,7 +169,8 @@
 
                 cols += '<td><button type="button" class="ibtnSave btn-success" data-href="addMyNewSet();" data-toggle="modal" data-target="#confirm-adding"><span class="fa fa-check-circle"></span></button>' +
                     '   <button type="button" class="ibtnRem btn-danger" aria-label="Close"> <span class="fa fa-times-circle"></span></button ></td > ';
-               
+                cols += '<td id="trash' + counter + '"></td>';
+
                 newRow.append(cols);
                 $(this).closest("table.table-striped").append(newRow);
                 counter++;
@@ -219,7 +221,7 @@
                                 dataType: "json",
                                 data: json,
                                 success: function (data) {
-
+                                    data = JSON.parse(data);
                                     $('#loading-indicator').hide();
                                     $(".addrow").show();
 
@@ -229,6 +231,8 @@
                                     $('td#aunit' + (counter - 1)).html(getStringForUnit("a", aunit, wunit));
                                     $('td#weight' + (counter - 1)).html(weight);
                                     $('td#wunit' + (counter - 1)).html(getStringForUnit("w", aunit, wunit));
+                                    $('td#trash' + (counter - 1)).html('<i onclick="setDelete(' + data.id + ')" class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete this set"></i>');
+                                    $('tr#insert').attr("id", data.id);
 
                                     $("#errorAdd").hide();
                                     $("#success").text("Congrats! Your stats have been added to this workout successfully!").show();
@@ -272,6 +276,73 @@
 
             }
             return answer;
+        }
+
+        function setDelete(set) {
+            var result = confirm("Are you sure you want to delete this set?");
+            if (result) {
+
+                var ProgramID = $("#ProgramCurrent").val().toString();
+
+                var json = JSON.stringify({
+                    'ProgramID': ProgramID,
+                    //'ExerciseID': ExerciseID,
+                    'SetID': set.toString()
+                });
+
+                $.ajax({
+                    url: '@Url.Action("DeleteSet", "Workout")',
+                    type: "POST",
+                    headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: json,
+                    success: function (data) {
+
+                        $('#'+set).remove();
+                        $("#success").text("The set was successfully deleted").show();
+                        setTimeout(function () {
+                            $("#success").fadeOut().empty();
+                        }, 5000);
+                    },
+                    error: function () {
+                        console.log("An error happened");
+                    }
+                });
+            }
+        }
+
+        function exercisesDelete(ex) {
+            var result = confirm("Are you sure you want to delete this exercise (all the associated set will also be deleted)?");
+            if (result) {
+
+                var ProgramID = $("#ProgramCurrent").val().toString();
+
+                var json = JSON.stringify({
+                    'ProgramID': ProgramID,
+                    'ExerciseID': ex.toString()
+                });
+
+                $.ajax({
+                    url: '@Url.Action("DeleteExercise", "Workout")',
+                    type: "POST",
+                    headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: json,
+                    success: function (data) {
+
+                        $('#'+set).remove();
+                        $("#success").text("The exercise and associated sets were successfully deleted").show();
+                        setTimeout(function () {
+                            $("#success").fadeOut().empty();
+                        }, 5000);
+                    },
+                    error: function () {
+                        console.log("An error happened");
+                    }
+                });
+            }
         }
     </script>
 }
