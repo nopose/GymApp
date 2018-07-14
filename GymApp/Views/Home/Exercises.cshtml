@@ -253,6 +253,9 @@
             $("#AddExerciseForm").trigger("reset");
             $("#AddExerciseForm").find(".validation-summary-valid ul").html("");
             $("#AddExerciseForm").find(".field-validation-valid").empty();
+            $("#AddExerciseForm").find("input").val("");
+            $("#AddExerciseForm").find("select").val(0);
+            $("#AddData_ProgramID").val(-1);
         });
     </script>
 

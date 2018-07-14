@@ -52,6 +52,8 @@
 
     <input hidden id="ProgramCurrent" value="@program.id" />
     <div class="tab-content">
+        <div id="topList" class="text-success">
+        </div>
         @for (int i = 1; i <= 7; i++)
         {
             if (i == 1)
@@ -67,7 +69,7 @@
                         int j = 0;
                         if (ex.day == i)
                         {
-                            <div class="card" style="margin-bottom:1%; margin-top:1%;">
+                            <div id="exercise@(ex.id)"class="card" style="margin-bottom:1%; margin-top:1%;">
                                 <div class="card-header">
                                     <div class="row card-group">
                                         <div class="form-group col-md-10">
@@ -331,11 +333,10 @@
                     dataType: "json",
                     data: json,
                     success: function (data) {
-
-                        $('#'+set).remove();
-                        $("#success").text("The exercise and associated sets were successfully deleted").show();
+                        $('#exercise' + ex).remove(); 
+                        $("#topList").text("The exercise and associated sets were successfully deleted");
                         setTimeout(function () {
-                            $("#success").fadeOut().empty();
+                            $("#topList").fadeOut().empty();
                         }, 5000);
                     },
                     error: function () {

@@ -236,6 +236,9 @@
             $("#AddExerciseForm").trigger("reset");
             $("#AddExerciseForm").find(".validation-summary-valid ul").html("");
             $("#AddExerciseForm").find(".field-validation-valid").empty();
+            $("#AddExerciseForm").find("input").val("");
+            $("#AddExerciseForm").find("select").val(0);
+            $("#ExerciseID").val(-1);
         });
     </script>
 

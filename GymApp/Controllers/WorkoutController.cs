@@ -188,6 +188,33 @@ namespace GymApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public ActionResult DeleteWorkout([FromBody]WorkoutViewModel data)
+        {
+            TrainingProgram tp = _context.Workouts.FirstOrDefault(W => W.id == data.ProgramID);
+
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+            //ProgramExercises toDelete = exer.FirstOrDefault(x => x.id == data.ExerciseID);
+
+            foreach (ProgramExercises prog in tp.Exercices)
+            {
+                foreach (ExerciseSets s in prog.SetInfo)
+                {
+                    _context.ESets.Remove(s);
+                }
+                _context.PExercises.Remove(prog);
+            }
+
+            _context.Workouts.Remove(tp);
+            _context.SaveChanges();
+
+            return Json("Success.");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddExerciseToWorkout(WorkoutViewModel model, string returnUrl = null)
         {
             ModelState.Remove("WorkoutName");
@@ -257,16 +284,16 @@ namespace GymApp.Controllers
 
             var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
 
-            ExerciseSets setToDelete;
-            foreach (var s in sets)//this delete the whole table oups
-            {
-                setToDelete = sets.FirstOrDefault(x => x.id == s.id);
-                _context.ESets.Remove(setToDelete);
-            }
-
             ProgramExercises toDelete = exer.FirstOrDefault(x => x.id == data.ExerciseID);
+
+            foreach (var s in toDelete.SetInfo)
+            {
+                _context.ESets.Remove(s);
+            }
+            
             _context.PExercises.Remove(toDelete);
             _context.SaveChanges();
+
             return Json("Success.");
         }
 

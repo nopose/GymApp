@@ -56,7 +56,7 @@ namespace GymApp.Controllers
                 {
                     foreach (var real_ex in exercisesFromAPI)
                     {
-                        if (ex.ExerciseID == real_ex.id)
+                        if (ex.ExerciseID == real_ex.id && (exerciseNames.GetValueOrDefault(ex.ExerciseID) == null))
                         {
                             exerciseNames.Add(ex.ExerciseID, real_ex.name);
                         }
