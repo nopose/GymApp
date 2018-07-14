@@ -21,11 +21,17 @@
                                 <label for="FirstName">First name</label>
                                 @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control", type = "text", aria_describedby = "nameHelp", placeholder = "Enter first name" })
                                 <span asp-validation-for="FirstName" class="text-danger"></span>
+                                <em style="font-size:80%;">
+                                    <p>Must contain between 2 and 100 characters</p>
+                                </em>
                             </div>
                             <div class="col-md-6">
                                 <label for="LastName">Last name</label>
                                 @Html.TextBoxFor(x => x.LastName, new { @class = "form-control", type = "text", aria_describedby = "nameHelp", placeholder = "Enter last name" })
                                 <span asp-validation-for="LastName" class="text-danger"></span>
+                                <em style="font-size:80%;">
+                                    <p>Must contain between 2 and 100 characters</p>
+                                </em>
                             </div>
                         </div>
                     </div>
@@ -40,6 +46,10 @@
                                 <label for="exampleInputPassword1">Password</label>
                                 @Html.TextBoxFor(x => x.Password, new { @class = "form-control", type = "password", aria_describedby = "emailHelp", placeholder = "Password" })
                                 <span asp-validation-for="Password" class="text-danger"></span>
+                                <em style="font-size:80%;">
+                                    <p>Password must have a minimum of 8 characters,
+                                    including a number, a capital letter and at least 2 unique characters</p>
+                                </em>
                             </div>
                             <div class="col-md-6">
                                 <label for="exampleConfirmPassword">Confirm password</label>
@@ -52,7 +62,7 @@
                 }
             </section>
             <div class="text-center">
-                <a class="d-block small mt-3" href="login.html">Login Page</a>
+                <a class="d-block small mt-3" href="@Url.Action("Login", "Account")">Login Page</a>
             </div>
         </div>
     </div>

@@ -10,12 +10,12 @@ namespace GymApp.Models
     public class RegisterViewModel
     {
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long.", MinimumLength = 2)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long.", MinimumLength = 2)]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
@@ -25,7 +25,7 @@ namespace GymApp.Models
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long. It must also contains at least one number, one capital letter, and 2 unique caracter.", MinimumLength = 8)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long. It must also contains at least one number, one capital letter, and 2 unique caracter.", MinimumLength = 8)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -45,7 +45,7 @@ namespace GymApp.Models
 
         [Required]
         [DataType(DataType.Password)]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long. It must also contains at least one number and one capital letter.", MinimumLength = 8)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long. It must also contains at least one number and one capital letter.", MinimumLength = 8)]
         public string Password { get; set; }
 
         [Display(Name = "Remember me?")]
@@ -59,12 +59,12 @@ namespace GymApp.Models
         public string UserID { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long.", MinimumLength = 2)]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long.", MinimumLength = 2)]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
@@ -75,13 +75,13 @@ namespace GymApp.Models
 
         // Password related information
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long. It must also contains at least one number and one capital letter.", MinimumLength = 8)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long. It must also contains at least one number and one capital letter.", MinimumLength = 8)]
         [DataType(DataType.Password)]
         [Display(Name = "Old Password")]
         public string OldPassword { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long. It must also contains at least one number and one capital letter.", MinimumLength = 8)]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long. It must also contains at least one number and one capital letter.", MinimumLength = 8)]
         [DataType(DataType.Password)]
         [Display(Name = "New Password")]
         public string NewPassword { get; set; }
