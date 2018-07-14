@@ -65,6 +65,16 @@ namespace GymApp.Controllers
             }
 
             DashboardViewModel model = new DashboardViewModel(workouts, exerciseNames);
+
+            Random rnd = new Random();
+            int r = rnd.Next(exercisesFromAPI.Count);
+            int r2;
+            do
+                r2 = rnd.Next(exercisesFromAPI.Count);
+            while (r == r2);
+
+            model.schedule.Suggested = new List<Exercise>() { exercisesFromAPI[r], exercisesFromAPI[r2] };
+
             return View(model);
         }
 

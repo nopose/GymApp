@@ -29,6 +29,7 @@ namespace GymApp.Models
     {
         public Dictionary<int, string> ExerciseNames { get; set; }
         public List<TrainingProgram> Workouts { get; set; }
+        public List<Exercise> Suggested { get; set; }
 
         public ScheduleData(List<TrainingProgram> workouts, Dictionary<int, string> exerciseNames) {
             ExerciseNames = exerciseNames;
