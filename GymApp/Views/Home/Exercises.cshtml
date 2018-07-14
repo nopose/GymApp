@@ -1,4 +1,15 @@
 ﻿@model ExercisesViewModel
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@{
+    List<TrainingProgram> workouts = ViewBag.Workouts;
+    //AppUser user = null;
+    //if (SignInManager.IsSignedIn(User))
+    //{
+    //    user = await UserManager.GetUserAsync(User);
+    //}
+}
 @*<script>
         $("#next").click(function(e) {
         e.preventDefault();
@@ -19,15 +30,25 @@
     });
     </script>*@
 <style>
-    .orange {
-        color: #ffc107 !important;
+    .program {
+        color: #ffc107;
+        font-size: 1.5em;
     }
+
+        .program:hover {
+            color: #ffc107;
+            text-shadow: 1px 1px 1px #ccc;
+            font-size: 1.5em;
+            text-decoration: underline;
+            text-decoration-style: solid;
+            text-decoration-color: #ffc107;
+        }
 </style>
 
 
 
 <h2>Exercises</h2>
-@if(Model.Search != null)
+@if (Model.Search != null)
 {
     string s = "Search result for: \"" + Model.Search + "\"";
     <h3>@s</h3>
@@ -60,14 +81,11 @@
         {
             if (ca.id == categoryId)
             {
-                
-             @:<div class="tab-pane active" id="@ca.name">
-            }
+                @:<div class="tab-pane active" id="@ca.name">
+                }
             else
             {
-                
-            @:<div class="tab-pane" id="@ca.name">
-
+                @:<div class="tab-pane" id="@ca.name">
             }
                 @foreach (Exercise ex in Model.Exercises.results)
                 {
@@ -76,39 +94,168 @@
                         <ul class="list-group media-list media-list-stream">
                             <ul class="list-group">
                                 <li class="list-group-item">
-                                        <div class="row">
-                                            <div class="col-md-2">
-                                                @if (ex.imageURL != null)
-                                                {
-                                                    <img style="max-width:100px; max-height:100px" class="card-img" src="@ex.imageURL" alt="@ex.name" />
-                                                }
-                                                else
-                                                {
-                                                    <img style="max-width:100px; max-height:100px" class="card-img" src="~/images/dumbbellSVG.png" alt="@ex.name" />
-                                                }
-                                            </div>
-                                            <div class="col-md-9">
-                                                <h5 class="font-weight-bold">
-                                                    @ex.name
-                                                </h5>
-                                                <p>
-                                                    @Html.Raw(ex.description)
-                                                </p>
-                                            </div>
-                                            <div class="col-md-1">
-                                                <span data-toggle="tooltip" data-placement="top" title="More info about this Exercise">@Html.ActionLink("", "ExerciseDetail", "Home", new { id = ex.id }, new { @class = "fa fa-info-circle program orange", style="font-size:1.5em;" })</span>
-                                            </div>
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            @if (ex.imageURL != null)
+                                            {
+                                                <img style="max-width:100px; max-height:100px" class="card-img" src="@ex.imageURL" alt="@ex.name" />
+                                            }
+                                            else
+                                            {
+                                                <img style="max-width:100px; max-height:100px" class="card-img" src="~/images/dumbbellSVG.png" alt="@ex.name" />
+                                            }
                                         </div>
+                                        <div class="col-md-10">
+                                            <h5 class="font-weight-bold">
+                                                @ex.name
+                                            </h5>
+                                            <p>
+                                                @Html.Raw(ex.description)
+                                            </p>
+                                        </div>
+                                        <div class="offset-md-2 col-md-1">
+                                            @if (SignInManager.IsSignedIn(User))
+                                            {
+                                                <a id="@ex.id" onclick="getExerciseID(@ex.id, `@ex.name`);" data-toggle="modal" data-target="#AddExerciseModal"><span data-toggle="tooltip" data-placement="top" title="Add this Exercise to a Workout"><i class="fa fa-plus-circle program"></i></span></a>
+                                            }
+                                        </div>
+                                        <div class="col-md-1">
+                                            <span data-toggle="tooltip" data-placement="top" title="More info about this Exercise">@Html.ActionLink("", "ExerciseDetail", "Home", new { id = ex.id }, new { @class = "fa fa-info-circle program orange", style = "font-size:1.5em;" })</span>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                         </ul>
                     }
                 }
-            @:</div>
-        }
+                @:</div>
+            }
+    </div>
+
+    <div class="modal fade" id="AddExerciseModal" tabindex="-1" role="dialog" aria-labelledby="ExerciseModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                @if (workouts.Count > 0)
+                {
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="ExerciseModal"> Adding an exercise to a program </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    @using (Html.BeginForm("AddExerciseToWorkout", "Home", FormMethod.Post, new { id = "AddExerciseForm" }))
+                    {
+                    <div class="modal-body">
+                        <input asp-for="Search" hidden />
+                        <input id="pid" asp-for="AddData.ExerciseID" hidden />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="AddData.ProgramID"></label>
+                            <select asp-for="AddData.ProgramID" class="form-control js-example-basic-single">
+                                <option value="-1">Choose a Workout..</option>
+                                @foreach (var item in workouts)
+                                {
+                                    <option value="@item.id">@item.name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="AddData.ProgramID" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="AddData.Day"></label>
+                            <select asp-for="AddData.Day" class="form-control">
+                                <option value="0" selected>Choose from..</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                            </select>
+                            <span asp-validation-for="AddData.Day" class="text-danger"></span>
+                        </div>
+                        <div class="SetInfo form-row col-md-12">
+                            <div class="form-group col-md-3">
+                                <label asp-for="AddData.Amount"></label>
+                                <input type="number" min="0" asp-for="AddData.Amount" class="form-control" />
+                                <span asp-validation-for="AddData.Amount" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label asp-for="AddData.Aunit"></label>
+                                <select asp-for="AddData.Aunit" class="form-control">
+                                    <option value="0" selected>Choose from..</option>
+                                    <option value="1">Kilometers</option>
+                                    <option value="2">Miles</option>
+                                    <option value="3">Minutes</option>
+                                    <option value="4">Repetitions</option>
+                                </select>
+                                <span asp-validation-for="AddData.Aunit" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label asp-for="AddData.Weight"></label>
+                                <input type="number" asp-for="AddData.Weight" class="form-control" />
+                                <span asp-validation-for="AddData.Weight" class="text-danger"></span>
+                                <em style="font-size:80%;">Optional</em>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label asp-for="AddData.Wunit"></label>
+                                <select asp-for="AddData.Wunit" class="form-control">
+                                    <option value="0" selected>Choose from..</option>
+                                    <option value="1">Body Weight</option>
+                                    <option value="2">Kilograms</option>
+                                    <option value="3">Pounds</option>
+                                </select>
+                                <span asp-validation-for="AddData.Wunit" class="text-danger"></span>
+                                <em style="font-size:80%;">Optional</em>
+                            </div>
+                        </div>
+                        <div class="form-row col-md-12 text-center">
+                            <em style="font-size:90%;">
+                                If you want to add more statistics to this exercise, you can do it
+                                in the program information. Those "first statistics" allow us to set a base for your account
+                                (e.g. It's your current maximum for this exercise).
+                            </em>
+                        </div>
+                    </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="modal-body text-danger">
+                        <div class="col-md-12 text-center" style="margin: 5%;">
+                            You don't have any program created
+                        </div>
+                        <a class="btn btn-primary col-md-12" href="@Url.Action("Workouts","Workout")">Click here to add one now!</a>
+                    </div>
+
+                }
+
+            </div>
+        </div>
     </div>
 </div>
 
-    @*@Html.ActionLink("Next page", "NavExercises", "Home", new { query = Model.Exercises.next }, new { @class = "btn btn-primary" })*@
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        function getExerciseID(pid, name) {
+            document.getElementById('pid').value = pid;
+            $("#ExerciseModal").text("Add the \"" + name + "\" exercise to a program");
+        };
+
+        $("#AddExerciseModal").on("hidden.bs.modal", function () {
+            $("#AddExerciseForm").trigger("reset");
+            $("#AddExerciseForm").find(".validation-summary-valid ul").html("");
+            $("#AddExerciseForm").find(".field-validation-valid").empty();
+        });
+    </script>
+
+}
 
 

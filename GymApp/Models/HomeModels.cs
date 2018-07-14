@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using GymApp.APIModels;
 using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace GymApp.Models
 {
@@ -42,10 +43,12 @@ namespace GymApp.Models
     public class ExercisesViewModel
     {
         public Result<Exercise> Exercises { get; set; }
-        //public List<Exercise> SearchedExercises { get; set; }
         public Result<ExerciseImage> ExerciseImages { get; set; }
         public Result<Category> Categories { get; set; }
         public string Search { get; set; }
+        public AddToWorkoutData AddData { get; set; }
+
+        public ExercisesViewModel() { }
 
         public ExercisesViewModel(bool hasResult)
         {
@@ -67,25 +70,8 @@ namespace GymApp.Models
                 }
             }
             Categories = getAllCategories();
+            AddData = new AddToWorkoutData();
         }
-
-        //public ExercisesViewModel(string query)
-        //{
-        //    var json = new WebClient().DownloadString(query);
-        //    Exercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
-
-        //    json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseimage/");
-        //    ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
-
-        //    foreach (ExerciseImage im in ExerciseImages.results)
-        //    {
-        //        Exercise ex = Exercises.results.Find(x => x.id == im.id);
-        //        if (ex != null)
-        //        {
-        //            ex.imageURL = im.image;
-        //        }
-        //    }
-        //}
 
         public ExercisesViewModel(bool hasResult, string search)
         {
@@ -97,6 +83,7 @@ namespace GymApp.Models
                 ExerciseImages = getAllExercisesImages();
             }
             Categories = getAllCategories();
+            AddData = new AddToWorkoutData();
         }
 
         public void doSearch()
@@ -139,6 +126,33 @@ namespace GymApp.Models
             Result<ExerciseImage> ExerciseImages = JsonConvert.DeserializeObject<Result<ExerciseImage>>(json);
             exerciseImage = ExerciseImages.results.FirstOrDefault();
         }
+    }
+
+    public class AddToWorkoutData
+    {
+        //public string UserID { get; set; }
+        public int ExerciseID { get; set; }
+
+        [Display(Name = "Workout Name")]
+        [Range(0, Int32.MaxValue, ErrorMessage = "The workout is required to be able to continue.")]
+        public int ProgramID { get; set; }
+
+        [Display(Name = "Day of workouk (1-7)")]
+        [Range(1, 7, ErrorMessage = "The day represent a day of the week, so it must be a value between 1 and 7 included.")]
+        public int Day { get; set; }
+
+        [Display(Name = "Amount")]
+        public int Amount { get; set; }
+
+        [Display(Name = "Unit")]
+        [Range(1, 4, ErrorMessage = "You need to select the unit for the amount that you've entered.")]
+        public int Aunit { get; set; }
+
+        [Display(Name = "Weight")]
+        public Nullable<int> Weight { get; set; }
+
+        [Display(Name = "Unit")]
+        public Nullable<int> Wunit { get; set; }
     }
     #endregion
 }

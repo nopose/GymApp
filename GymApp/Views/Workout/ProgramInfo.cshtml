@@ -114,8 +114,8 @@
                                                                     <a class="removeRow"></a>
                                                                 </td>
                                                             </tr>
-                                                            <div class="SuccessIF text-success"></div>
-                                                            <div class="ErrorIf text-danger"></div>
+                                                            @*<div class="SuccessIF text-success"></div>
+                                                            <div class="ErrorIf text-danger"></div>*@
                                                         }
                                                     }
                                                 </tbody>
@@ -128,6 +128,8 @@
                                                     <tr></tr>
                                                 </tfoot>
                                             </table>
+                                            <p id="success" class="SuccessIF text-success"></p>
+                                            <p id="errorAdd" class="ErrorIf text-danger"></p >
                                         </div>
                                     </div>
                                 </div>
@@ -148,9 +150,14 @@
     <script>
 
         $(document).ready(function () {
+            $("#success").hide();
+            $("#errorAdd").hide();
             var counter = 0;
 
             $(".addrow").on("click", function () {
+                $(".addrow").hide();
+                $("#success").show();
+                $("#errorAdd").show();
                 var newRow = $("<tr>");
                 var cols = "";
 
@@ -161,6 +168,7 @@
 
                 cols += '<td><button type="button" class="ibtnSave btn-success" data-href="addMyNewSet();" data-toggle="modal" data-target="#confirm-adding"><span class="fa fa-check-circle"></span></button>' +
                     '   <button type="button" class="ibtnRem btn-danger" aria-label="Close"> <span class="fa fa-times-circle"></span></button ></td > ';
+               
                 newRow.append(cols);
                 $(this).closest("table.table-striped").append(newRow);
                 counter++;
@@ -168,12 +176,15 @@
 
             $("table.table-striped").on("click", ".ibtnRem", function (event) {
                 $(this).closest("tr").remove();
+                $("#success").hide();
+                $("#errorAdd").hide();
                 counter -= 1
+                $(".addrow").show();
             });
 
             $("table.table-striped").on("click", ".ibtnSave", function (event) {
-                $(this).closest(".ErrorIf").html("").hide();
-                $(this).closest(".SuccessIf").html("").hide();
+                //$("#errorAdd").text("").hide();
+                //$("#success").text("").hide();
                 var amount = document.getElementById("iamount" + (counter - 1)).value;
                 var aunit = document.getElementById("iaunit" + (counter - 1)).value;
                 var weight = document.getElementById("iweight" + (counter - 1)).value;
@@ -196,7 +207,7 @@
                     if (aunit > 0) {
                         if ((weight > 0 && wunit > 0) || weight == "") {
 
-                            if (weight == "") { weight = "N/A"; }
+                            if (weight == "") { weight = "0"; }
 
                             $('#loading-indicator').show();
 
@@ -210,6 +221,7 @@
                                 success: function (data) {
 
                                     $('#loading-indicator').hide();
+                                    $(".addrow").show();
 
                                     $('td#aunit' + (counter - 1)).empty();
                                     $('td#wunit' + (counter - 1)).empty();
@@ -218,10 +230,10 @@
                                     $('td#weight' + (counter - 1)).html(weight);
                                     $('td#wunit' + (counter - 1)).html(getStringForUnit("w", aunit, wunit));
 
-                                    $(this).closest(".ErrorIf").html("").hide();
-                                    $(this).closest(".SuccessIf").html("Congrats! Your stats have been added to this workout successfully!").show();
+                                    $("#errorAdd").hide();
+                                    $("#success").text("Congrats! Your stats have been added to this workout successfully!").show();
                                     setTimeout(function () {
-                                        $(this).closest(".SuccessIf").fadeOut().empty();
+                                        $("#success").fadeOut().empty();
                                     }, 5000);
                                 },
                                 error: function () {
@@ -232,11 +244,14 @@
                             $(this).remove();
                             $(".ibtnRem").remove();
 
-                        } else { $(this).closest(".ErrorIf").html("The weight can't be 0 and if it's greater than 0 the amount needs to be chosen as well...").show(); }
-                    } else { $(this).closest(".ErrorIf").html("The unit for the amount needs to be chosen...").show(); }
+                        } else { $("#errorAdd").html("The weight can't be 0 and if it's greater than 0 the unit needs to be chosen as well"); $("#errorAdd").show(); }
+                    } else {
+                        $("#errorAdd").html("The unit for the amount needs to be chosen");
+                        $("#errorAdd").show();
+                    }
                 } else {
-                    $(this).closest(".ErrorIf").html("The amount needs to be entered...");
-                    $(this).closest(".ErrorIf").show();
+                    $("#errorAdd").html("A value for amount needs to be entered");
+                    $("#errorAdd").show();
                 }
             });
         });
@@ -250,7 +265,7 @@
                 else if (aunit == 4) { answer = "Repetition"; }
 
             } else if (unit === "w") {
-                if (wunit == 0) { answer = "N/A"; }
+                if (wunit == 0) { answer = ""; }
                 else if (wunit == 1) { answer = "Body Weight"; }
                 else if (wunit == 2) { answer = "Kilograms"; }
                 else if (wunit == 3) { answer = "Pounds"; }

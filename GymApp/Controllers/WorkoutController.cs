@@ -113,6 +113,41 @@ namespace GymApp.Controllers
             return Json("Success.");
         }
 
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult DeleteSets([FromBody]WorkoutViewModel data)
+        //{
+        //    TrainingProgram tp = _context.Workouts.FirstOrDefault(W => W.id == data.ProgramID);
+
+        //    int? weight = 0;
+
+        //    if (!(data.Weight == null)) { weight = data.Weight; }
+
+        //    var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+        //    var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+        //    ProgramExercises p_ex = tp.Exercices.FirstOrDefault(E => E.id == data.ExerciseID);
+
+        //    _context.ESets.FromSql("DELETE FROM ESets WHERE id=''");
+
+        //    ExerciseSets newSet = new ExerciseSets
+        //    {
+        //        amount = data.Amount,
+        //        aunit = data.Aunit,
+        //        weight = (int)weight,
+        //        wunit = (int)data.Wunit
+        //    };
+
+        //    p_ex.SetInfo.Add(newSet);
+
+        //    tp.Exercices.Add(p_ex);
+
+        //    _context.Workouts.Update(tp);
+        //    _context.SaveChanges();
+        //    return Json("Success.");
+        //}
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AddWorkout(WorkoutViewModel model, string returnUrl = null)
@@ -199,8 +234,8 @@ namespace GymApp.Controllers
                 {
                     amount = amount,
                     aunit = aunit,
-                    weight = (int) weight,
-                    wunit = (int) wunit
+                    weight = (weight == null ? 0 : (int)weight),
+                    wunit = (wunit == null ? 0 : (int)wunit)
                 };
 
                 ProgramExercises p_ex = new ProgramExercises

@@ -109,6 +109,8 @@ namespace GymApp.Controllers
                 };
             }
 
+            ViewBag.Workouts = getWorkoutsForUser();
+
             return View(model);
         }
 
@@ -141,6 +143,7 @@ namespace GymApp.Controllers
                 };
             }
             model.doSearch();
+            ViewBag.Workouts = getWorkoutsForUser();
 
             return View("Exercises", model);
         }
@@ -159,6 +162,68 @@ namespace GymApp.Controllers
             ExerciseDetailViewModel model = new ExerciseDetailViewModel(id);
             return View(model);
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddExerciseToWorkout(ExercisesViewModel model, string returnUrl = null)
+        {
+            AddToWorkoutData dataModel = model.AddData;
+
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                string userID = _userManager.GetUserId(User);
+                int programID = dataModel.ProgramID;
+                int exerciseID = dataModel.ExerciseID;
+                int day = dataModel.Day;
+                int amount = dataModel.Amount;
+                int aunit = dataModel.Aunit;
+                int? weight = dataModel.Weight;
+                int? wunit = dataModel.Wunit;
+
+                if (weight != null && wunit < 1)
+                {
+                    TempData["ErrorMessage"] = "If you enter a weight, you need to enter the weight unit as well.";
+                    ViewBag.Workouts = getWorkoutsForUser();
+                    return View("Exercises", model);
+                }
+
+                TrainingProgram tp = await _context.Workouts.FirstOrDefaultAsync(X => X.id == programID);
+                ExerciseSets e_set = new ExerciseSets
+                {
+                    amount = amount,
+                    aunit = aunit,
+                    weight = (weight == null ? 0 : (int)weight),
+                    wunit = (wunit == null ? 0: (int)wunit)
+                };
+
+                ProgramExercises p_ex = new ProgramExercises
+                {
+                    ExerciseID = exerciseID,
+                    day = day
+                };
+
+                p_ex.SetInfo.Add(e_set);
+
+                tp.Exercices.Add(p_ex);
+
+                _context.Workouts.Update(tp);
+                await _context.SaveChangesAsync();
+
+                ViewBag.Workouts = getWorkoutsForUser();
+                TempData["SuccessMessage"] = "Congrats! Your exercise has been added successfully.";
+                if(model.Search == null)
+                    return RedirectToAction("Exercises");
+                else
+                    return RedirectToAction("SearchExercises");
+            }
+            ViewBag.Workouts = getWorkoutsForUser();
+            TempData["ErrorMessage"] = "Oops... Something hapenned...";
+            return View("Exercises", model);
+        }
+
+
 
         public IActionResult HomePage()
         {
