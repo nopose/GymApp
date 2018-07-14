@@ -15,8 +15,8 @@ namespace GymApp.Models
         public ScheduleData schedule { get; set; }
         public GraphData graphData { get; set; }
 
-        public DashboardViewModel() {
-            schedule = new ScheduleData();
+        public DashboardViewModel(List<TrainingProgram> workouts, Dictionary<int, string> exerciseNames) {
+            schedule = new ScheduleData(workouts, exerciseNames);
             graphData = new GraphData();
         }
     }
@@ -27,10 +27,12 @@ namespace GymApp.Models
 
     public class ScheduleData
     {
-        public List<string> Exercises { get; set; }
+        public Dictionary<int, string> ExerciseNames { get; set; }
+        public List<TrainingProgram> Workouts { get; set; }
 
-        public ScheduleData() {
-            Exercises = new List<string>();
+        public ScheduleData(List<TrainingProgram> workouts, Dictionary<int, string> exerciseNames) {
+            ExerciseNames = exerciseNames;
+            Workouts = workouts;
         }
     }
     #endregion

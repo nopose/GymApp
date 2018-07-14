@@ -11,24 +11,61 @@ using GymApp.APIModels;
 using GymApp.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymApp.Controllers
 {
 
     public class HomeController : Controller
     {
-        private IMemoryCache _cache;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
         private readonly GymAppContext _context;
+        private IMemoryCache _cache;
 
-        public HomeController(GymAppContext context, IMemoryCache memoryCache)
+        public HomeController(
+                    UserManager<AppUser> userManager,
+                    SignInManager<AppUser> signInManager,
+                    GymAppContext context,
+                    IMemoryCache cache)
         {
+            _userManager = userManager;
+            _signInManager = signInManager;
             _context = context;
-            _cache = memoryCache;
+            _cache = cache;
         }
 
         public IActionResult Index()
         {
-            return View(new DashboardViewModel());
+            Dictionary<int, string> exerciseNames = new Dictionary<int, string>();
+
+            //TrainingProgram program = await _context.Workouts.FirstOrDefaultAsync(W => W.id == id && W.uid == _userManager.GetUserId(User));
+
+            List<TrainingProgram> workouts = getWorkoutsForUser();
+
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+            List<Exercise> exercisesFromAPI = getExercisesFromAPI();
+
+            foreach (var pro in workouts)
+            {
+                foreach (var ex in pro.Exercices)
+                {
+                    foreach (var real_ex in exercisesFromAPI)
+                    {
+                        if (ex.ExerciseID == real_ex.id)
+                        {
+                            exerciseNames.Add(ex.ExerciseID, real_ex.name);
+                        }
+                    }
+                }
+            }
+
+            DashboardViewModel model = new DashboardViewModel(workouts, exerciseNames);
+            return View(model);
         }
 
         public IActionResult About()
@@ -118,9 +155,43 @@ namespace GymApp.Controllers
             return View();
         }
 
-        public IActionResult Error()
+        //public IActionResult Error()
+        //{
+        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        //}
+
+
+        private List<TrainingProgram> getWorkoutsForUser()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            List<TrainingProgram> workouts = new List<TrainingProgram>();
+
+            var userID = _userManager.GetUserId(User);
+
+            if (userID != null)
+            {
+                workouts = _context.Workouts
+                    .Where(W => W.uid.Equals(userID))
+                    .OrderBy(W => W.StartDate)
+                    .ToList();
+            }
+
+            return workouts;
+        }
+
+        private List<Exercise> getExercisesFromAPI()
+        {
+            Result<Exercise> cacheExercises;
+
+            if (!(_cache.TryGetValue("Exercises", out cacheExercises)))
+            {
+                var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
+                cacheExercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
+
+                // Save data in cache.
+                _cache.Set("Exercises", cacheExercises.ShallowCopy());
+            }
+
+            return cacheExercises.results;
         }
     }
 }
