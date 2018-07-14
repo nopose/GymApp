@@ -6,7 +6,7 @@
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
 @{
-    ViewData["Title"] = "My Programs";
+    ViewData["Title"] = "My Workouts";
     AppUser user = null;
     List<TrainingProgram> workouts = ViewBag.Workouts;
     List<Exercise> exercises = ViewBag.Exercises;
@@ -35,9 +35,9 @@
     @if (workouts.Count == 0)
     {
         <div class="row text-center">
-            <h5>You don't have any programs right now....</h5>
+            <h5>You don't have any Workouts right now....</h5>
             <div class="form-group col-md-12">
-                <button class="btn btn-primary col-md-12" onclick="CreateProgram();" data-toggle="modal" data-target="#CreateProgramModal">Add new program right now!</button>
+                <button class="btn btn-primary col-md-12" onclick="CreateProgram();" data-toggle="modal" data-target="#CreateProgramModal">Add a new Workout right now!</button>
             </div>
         </div>
 
@@ -46,7 +46,7 @@
     {
         @foreach (var item in workouts)
         {
-            <div class="card" style="margin-bottom:1%;">
+            <div id="workout@(item.id)" class="card" style="margin-bottom:1%;">
                 <div class="card-header">
                     Workout #@(workouts.IndexOf(item) + 1)
                 </div>
@@ -61,11 +61,18 @@
                         <div class="col-md-3">
                             <p class="card-text">End Date : @item.EndDate.ToLongDateString()</p>
                         </div>
-                        <div class="col-md-1 text-center">
+                        <div class="col-md-1 mt-3 text-center">
                             <a id="@item.id" onclick="getProgramID(@item.id);" data-toggle="modal" data-target="#AddExerciseModal"><span data-toggle="tooltip" data-placement="top" title="Add Exercise to this Workout"><i class="fa fa-plus-circle program"></i></span></a>
                         </div>
-                        <div class="col-md-1">
+                        <div class="col-md-1 mt-3 text-center">
                             <span data-toggle="tooltip" data-placement="top" title="More info about this Workout">@Html.ActionLink("", "WorkoutInfo", "Workout", new { id = item.id }, new { @class= "fa fa-info-circle program" })</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-1">
+                            <a class="nav-link" onclick="workoutDelete(@item.id)">
+                                <i class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Workout"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -73,7 +80,7 @@
         }
         <div class="card">
             <div class="card-body">
-                <button class="btn btn-primary col-md-12" data-toggle="modal" data-target="#CreateProgramModal">Add new program right now!</button>
+                <button class="btn btn-primary col-md-12" data-toggle="modal" data-target="#CreateProgramModal">Add a new Workout right now!</button>
             </div>
         </div>
     }
@@ -82,7 +89,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Creating a new Program</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Creating a new Workout</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -126,7 +133,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="ExerciseModal">Adding an exercise to a program</h5>
+                    <h5 class="modal-title" id="ExerciseModal">Adding an exercise to a Workout</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -199,7 +206,7 @@
                     </div>
                     <div class="form-row col-md-12 text-center">
                         <em style="font-size:90%;">If you want to add more statistics to this exercise, you can do it 
-                        in the program information. Those "first statistics" allow us to set a base for your account 
+                        in the Workout information. Those "first statistics" allow us to set a base for your account 
                         (e.g. It's your current maximum for this exercise).</em>
                     </div>
                 </div>
@@ -240,6 +247,34 @@
             $("#AddExerciseForm").find("select").val(0);
             $("#ExerciseID").val(-1);
         });
+
+        function workoutDelete(ex) {
+            var result = confirm("Are you sure you want to delete this Workout (all the associated Exercises and Sets will also be deleted)?");
+            if (result) {
+                var json = JSON.stringify({
+                    'ProgramID': ex.toString()
+                });
+
+                $.ajax({
+                    url: '@Url.Action("DeleteWorkout", "Workout")',
+                    type: "POST",
+                    headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: json,
+                    success: function (data) {
+                        $('#workout' + ex).remove(); 
+                        $("#topList").text("The Workout and associated Exercises and Sets were successfully deleted");
+                        setTimeout(function () {
+                            $("#topList").fadeOut().empty();
+                        }, 5000);
+                    },
+                    error: function () {
+                        console.log("An error happened");
+                    }
+                });
+            }
+        }
     </script>
 
 }

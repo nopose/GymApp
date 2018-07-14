@@ -65,7 +65,7 @@ namespace GymApp.Controllers
                 {
                     foreach (var real_ex in exercisesFromAPI)
                     {
-                        if (ex.ExerciseID == real_ex.id)
+                        if (ex.ExerciseID == real_ex.id && (exerciseNames.GetValueOrDefault(ex.ExerciseID) == null))
                         {
                             exerciseNames.Add(ex.ExerciseID, real_ex.name);
                         }
@@ -75,7 +75,7 @@ namespace GymApp.Controllers
                 ViewBag.Names = exerciseNames;
                 return View("ProgramInfo", new WorkoutViewModel());
             }
-            TempData["ErrorMessage"] = "The program you've selected does not exist...";
+            TempData["ErrorMessage"] = "The Workout you've selected does not exist...";
             return View("Program");
         }
 
@@ -175,7 +175,7 @@ namespace GymApp.Controllers
                 _context.Workouts.Add(newProgram);
                 _context.SaveChanges();
 
-                TempData["SuccessMessage"] = "Your new workout has been added successfully!";
+                TempData["SuccessMessage"] = "Your new Workout has been added successfully!";
                 ViewBag.Exercises = ExercisesList;
                 ViewBag.Workouts = getWorkoutsForUser();
                 return View("Program");
@@ -265,7 +265,7 @@ namespace GymApp.Controllers
 
                 ViewBag.Exercises = ExercisesList;
                 ViewBag.Workouts = getWorkoutsForUser();
-                TempData["SuccessMessage"] = "Congrats! Your exercise has been added successfully.";
+                TempData["SuccessMessage"] = "Congrats! Your Exercise has been added successfully.";
                 return View("Program", new WorkoutViewModel());
             }
             ViewBag.Exercises = ExercisesList;

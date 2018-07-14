@@ -76,7 +76,7 @@
                                             <h5 class="card-title">@names.GetValueOrDefault(ex.ExerciseID)</h5>
                                         </div>
                                         <div class="form-group col-md-1">
-                                            <a class="nav-link" data-toggle="collapse" href="#set@(ex.ExerciseID)">
+                                            <a class="nav-link" data-toggle="collapse" href="#set@(ex.id)">
                                                 <i class="fa fa-fw fa-expand" data-toggle="tooltip" data-placement="top" title="Open Sets information"></i>
                                             </a>
                                         </div>
@@ -86,7 +86,7 @@
                                             </a>
                                         </div>
                                     </div>
-                                    <div class="collapse" id="set@(ex.ExerciseID)">
+                                    <div class="collapse" id="set@(ex.id)">
                                         <div class="card card-body">
                                             <table id="ExerciseTable" tag="@(ex.id)" class="table table-striped">
                                                 <thead>
@@ -125,7 +125,7 @@
                                                 <tfoot>
                                                     <tr>
                                                         <td colspan="5" style="text-align: left;">
-                                                            <input type="button" class="btn btn-lg btn-block btn-primary addrow" value="Add Row" />
+                                                            <input type="button" class="btn btn-lg btn-block btn-primary addrow" value="Add Set" />
                                                         </td>
                                                     </tr>
                                                     <tr></tr>
@@ -281,7 +281,7 @@
         }
 
         function setDelete(set) {
-            var result = confirm("Are you sure you want to delete this set?");
+            var result = confirm("Are you sure you want to delete this Set?");
             if (result) {
 
                 var ProgramID = $("#ProgramCurrent").val().toString();
@@ -302,7 +302,7 @@
                     success: function (data) {
 
                         $('#'+set).remove();
-                        $("#success").text("The set was successfully deleted").show();
+                        $("#success").text("The Set was successfully deleted").show();
                         setTimeout(function () {
                             $("#success").fadeOut().empty();
                         }, 5000);
@@ -315,7 +315,7 @@
         }
 
         function exercisesDelete(ex) {
-            var result = confirm("Are you sure you want to delete this exercise (all the associated set will also be deleted)?");
+            var result = confirm("Are you sure you want to delete this Exercise (all the associated Sets will also be deleted)?");
             if (result) {
 
                 var ProgramID = $("#ProgramCurrent").val().toString();
@@ -334,7 +334,7 @@
                     data: json,
                     success: function (data) {
                         $('#exercise' + ex).remove(); 
-                        $("#topList").text("The exercise and associated sets were successfully deleted");
+                        $("#topList").text("The Exercise and associated Sets were successfully deleted");
                         setTimeout(function () {
                             $("#topList").fadeOut().empty();
                         }, 5000);
