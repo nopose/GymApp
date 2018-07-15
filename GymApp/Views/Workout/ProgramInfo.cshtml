@@ -70,7 +70,7 @@
             {
                 <div class="card" style="margin-bottom:1%; margin-top:1%;">
                     <div class="card-header text-center" style="padding-top:2.5%;">
-                        <h5 class="card-title">You have no current exercises for this day...</h5>
+                        <h5 class="card-title">You currently have no exercises for this day</h5>
                     </div>
                 </div>
             } 
@@ -164,8 +164,11 @@
                                 </div>
                             }
                         }
-                    }@:</div>
+                    }
             }
+            
+            @:</div>
+        }
     </div>
     <div class="row" style="margin-top:10%;">
         @Html.ActionLink("Back to workouts", "Workouts", "Workout", null, new { @class = "btn btn-primary col-md-3" })
