@@ -81,4 +81,13 @@ namespace GymApp.APIModels
         public string name { get; set; }
         public bool is_front { get; set; }
     }
+
+    public class GraphDataJson
+    {
+        public string WorkoutName { get; set; }
+        public string ExerciseName { get; set; }
+        public int GraphMax { get; set; }
+        public List<string> Values { get; set; } = new List<string>();
+        public List<string> Label { get; set; } = new List<string>();
+    }
 }

@@ -24,6 +24,8 @@ namespace GymApp.Models
 
         [NotMapped]
         public int ActualExercisesCount { get; set; } = 0;
+        [NotMapped]
+        public int ActualDay { get; set; }
 
     }
 
@@ -36,6 +38,9 @@ namespace GymApp.Models
         public int ExerciseID { get; set; } // FROM API.
 
         public List<ExerciseSets> SetInfo { get; set; } = new List<ExerciseSets>();
+
+        [NotMapped]
+        public string Name { get; set; }
     }
 
     public class ExerciseSets

@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GymApp.Controllers
 {
@@ -38,7 +39,7 @@ namespace GymApp.Controllers
 
         public IActionResult Index()
         {
-            Dictionary<int, string> exerciseNames = new Dictionary<int, string>();
+            //Dictionary<int, string> exerciseNames = new Dictionary<int, string>();
 
             //TrainingProgram program = await _context.Workouts.FirstOrDefaultAsync(W => W.id == id && W.uid == _userManager.GetUserId(User));
 
@@ -52,16 +53,17 @@ namespace GymApp.Controllers
             
             foreach (var pro in workouts)
             {
-                int day = calculateDayNumber(pro.StartDate, pro.EndDate);
+                pro.ActualDay = calculateDayNumber(pro.StartDate, pro.EndDate);
                 foreach (var ex in pro.Exercices)
                 {
-                    if(ex.day == day)
+                    if(ex.day == pro.ActualDay)
                     {
                         foreach (var real_ex in exercisesFromAPI)
                         {
-                            if (ex.ExerciseID == real_ex.id && (exerciseNames.GetValueOrDefault(ex.ExerciseID) == null))
+                            if (ex.ExerciseID == real_ex.id)
                             {
-                                exerciseNames.Add(ex.ExerciseID, real_ex.name);
+                                //exerciseNames.Add(ex.ExerciseID, real_ex.name);
+                                ex.Name = real_ex.name;
                                 pro.ActualExercisesCount++;
                             }
                         }
@@ -69,7 +71,7 @@ namespace GymApp.Controllers
                 }
             }
 
-            DashboardViewModel model = new DashboardViewModel(workouts, exerciseNames);
+            DashboardViewModel model = new DashboardViewModel(workouts);
 
             Random rnd = new Random();
             int r = rnd.Next(exercisesFromAPI.Count);
@@ -81,6 +83,42 @@ namespace GymApp.Controllers
             model.schedule.Suggested = new List<Exercise>() { exercisesFromAPI[r], exercisesFromAPI[r2] };
 
             return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult GetExercisesByID([FromBody]ModelDummy data)
+        {
+            int workoutID = data.workoutID;
+            TrainingProgram program = _context.Workouts.FirstOrDefault(W => W.id == workoutID && W.uid == _userManager.GetUserId(User));
+
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+            List<Exercise> exercisesFromAPI = getExercisesFromAPI();
+            List<ProgramExercises> filtered = new List<ProgramExercises>();
+
+            if (!(program is null))
+            {
+                foreach (var ex in program.Exercices)
+                {
+                    if(!filtered.Any(x => x.ExerciseID == ex.ExerciseID))
+                    {
+                        filtered.Add(ex);
+                        foreach (var real_ex in exercisesFromAPI)
+                        {
+                            if (ex.ExerciseID == real_ex.id)
+                            {
+                                ex.Name = real_ex.name;
+                            }
+                        }
+                    }
+                }
+            }
+
+            SelectList list = new SelectList(filtered, "id", "Name", 0);
+            return Json(JsonConvert.SerializeObject(list));
         }
 
         public IActionResult About()
@@ -226,10 +264,72 @@ namespace GymApp.Controllers
             return View();
         }
 
-        //public IActionResult Error()
-        //{
-        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult GraphData()
+        {
+            List<TrainingProgram> workouts = getWorkoutsForUser();
+
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+            List<Exercise> exercisesFromAPI = getExercisesFromAPI();
+            int exerciseID = workouts[0].Exercices[0].ExerciseID;
+            workouts[0].Exercices.Sort((x, y) => x.day.CompareTo(y.day));
+            int max = 0;
+            int graphMax = 0;
+            int choice = 0;
+            GraphDataJson data = new GraphDataJson();
+            foreach (ProgramExercises ex in workouts[0].Exercices)
+            {
+                if(ex.ExerciseID == exerciseID)
+                {
+                    switch (choice)
+                    {
+                        case 0:
+                            foreach (ExerciseSets set in ex.SetInfo)
+                            {
+                                if (set.amount > max)
+                                    max = set.amount;
+                                if (max > graphMax)
+                                    graphMax = max;
+                            }
+                            data.Label.Add("Day " + ex.day);
+                            data.Values.Add(max.ToString());
+                            break;
+                        case 1:
+                            foreach (ExerciseSets set in ex.SetInfo)
+                            {
+                                if (set.weight > max)
+                                    max = set.amount;
+                                if (max > graphMax)
+                                    graphMax = max;
+                            }
+                            data.Label.Add("Day " + ex.day);
+                            data.Values.Add(max.ToString());
+                            break;
+                    }
+                    
+                }
+            }
+
+            //foreach (var ex in workouts[0].Exercices)
+            //{
+            //    foreach (var real_ex in exercisesFromAPI)
+            //    {
+            //        if (ex.ExerciseID == real_ex.id && (exerciseNames.GetValueOrDefault(ex.ExerciseID) == null))
+            //        {
+            //            exerciseNames.Add(ex.ExerciseID, real_ex.name);
+            //            pro.ActualExercisesCount++;
+            //        }
+            //    }
+            //}
+            data.GraphMax = graphMax * 2;
+            data.WorkoutName = workouts[0].name;
+            data.ExerciseName = getExerciseName(exerciseID);
+            return Json(JsonConvert.SerializeObject(data));
+        }
 
 
         private List<TrainingProgram> getWorkoutsForUser()
@@ -263,6 +363,13 @@ namespace GymApp.Controllers
             }
 
             return cacheExercises.results;
+        }
+
+        private string getExerciseName(int id)
+        {
+            var json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseinfo/" + id);
+            ExerciseInfo ex = JsonConvert.DeserializeObject<ExerciseInfo>(json);
+            return ex.name;
         }
 
         //calculate the day number to match with the workout

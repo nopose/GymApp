@@ -296,7 +296,6 @@
             $("#AddWorkoutForm").trigger("reset");
             $("#AddWorkoutForm").find(".validation-summary-valid ul").html("");
             $("#AddWorkoutForm").find(".field-validation-valid").empty();
-            $("#AddWorkoutForm").find("#modal-title").html("Adding an exercise to a Workout");
         });
 
         $("#AddExerciseModal").on("hidden.bs.modal", function () {
@@ -343,6 +342,12 @@
             $("#EditWorkoutForm").find("#StartDateE").val(start);
             $("#EditWorkoutForm").find("#EndDateE").val(end);
         }
+
+        $("#EditProgramModal").on("hidden.bs.modal", function () {
+            $("#EditWorkoutForm").trigger("reset");
+            $("#EditWorkoutForm").find(".validation-summary-valid ul").html("");
+            $("#EditWorkoutForm").find(".field-validation-valid").empty();
+        });
 
         //$(document).ready(function () {
         //    $("#mainNav").find("a").click(function () {

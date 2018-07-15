@@ -72,15 +72,17 @@
                                             <ul>
                                                 @foreach (ProgramExercises ex in work.Exercices)
                                                 {
-
-                                                    var name = Model.schedule.ExerciseNames.GetValueOrDefault(ex.ExerciseID);
-                                                    if (name != null)
+                                                    if (ex.day == work.ActualDay)
                                                     {
-                                                        <li>
-                                                            @Html.ActionLink(name, "ExerciseDetail", "Home", new { id = ex.ExerciseID }, new { @class = "text-white", data_toggle = "tooltip", data_placement = "top", title = "More info about this Exercise" })
-                                                        </li>
-                                                    }
+                                                        //var name = Model.schedule.ExerciseNames.GetValueOrDefault(ex.ExerciseID);
+                                                        //if (name != null)
+                                                        //{
+                                                            <li>
+                                                                @Html.ActionLink(ex.Name, "ExerciseDetail", "Home", new { id = ex.ExerciseID }, new { @class = "text-white", data_toggle = "tooltip", data_placement = "top", title = "More info about this Exercise" })
+                                                            </li>
+                                                        //}
 
+                                                    }
                                                 }
                                             </ul>
                                         </div>
@@ -169,15 +171,33 @@
 
 
     <div class="container-fluid">
-        <!-- Area Chart Example-->
+        <!-- Area Chart -->
         <div class="card mb-3">
             <div class="card-header">
-                <i class="fa fa-area-chart"></i> Area Chart Example
+                <i class="fa fa-area-chart"></i> <span id="chartTitle">Your Progress</span>
             </div>
             <div class="card-body">
-                <canvas id="myAreaChart" width="100%" height="30"></canvas>
+                <canvas id="myChart" width="100%" height="30"></canvas>
             </div>
-            <div class="card-footer small text-muted">Updated yesterday at 11:59 PM</div>
+            <div class="card-footer small text-muted">
+                <div class="row">
+                    <div class="col-md-3">
+                        <select id="workoutSelect" onchange="javascript:getList(this.value);">
+                            <option value="0">Choose a Workout</option>
+                            @foreach (TrainingProgram work in Model.schedule.Workouts)
+                            {
+                                <option value="@work.id">@work.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div id="exerciseDiv" style="display:none;">
+                        <select id="exerciseSelect" onchange="javascript:showButton(this.value);"></select>
+                    </div>
+                    <div class="col-md-3" id="buttonDiv" style="display:none;">
+                        <button id="test">Generate Graph</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- /.container-fluid-->
@@ -210,4 +230,237 @@
     <!-- Page level plugin JavaScript-->
     <script src="~/style/vendor/chart.js/Chart.min.js"></script>
     <!-- Custom scripts for this page-->
-    <script src="~/style/js/sb-admin-charts.min.js"></script>
+    @*<script src="~/style/js/sb-admin-charts.min.js"></script>*@
+<script>
+    function showButton(id) {
+        if (id > 0) {
+            $("#buttonDiv").show();
+        }
+        else {
+            $("#buttonDiv").hide();
+        }
+    }
+
+    function getList(_id) {
+        if (_id == 0) {
+            $("#buttonDiv").hide();
+            $("#exerciseDiv").hide();
+        }
+        else {
+            $("#exerciseDiv").show();
+
+            var json = JSON.stringify({
+                'workoutID': _id
+            });
+
+            $.ajax({
+                url: '@Url.Action("GetExercisesByID", "Home")',
+                type: "POST",
+                headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: json,
+                cache: false,
+                success: function (data) {
+                    data = JSON.parse(data);
+                    console.log(data);
+                    var markup = "<option value='0'>Choose an Exercise</option>";
+                    for (var x = 0; x < data.length; x++) {
+                        markup += "<option value=" + data[x].Value + ">" + data[x].Text + "</option>";
+                    }
+                    $("#exerciseSelect").html(markup);
+                    $("#exerciseDiv").show();
+                },
+                error: function (reponse) {
+                    alert("error : " + reponse);
+                }
+                });
+        }
+    }
+
+
+
+
+    //Chart
+    $("#test").click(function () { 
+        var data = [50];
+        var label = ["Day 8"];
+        myLineChart.data.labels.pop();
+        myLineChart.data.datasets.forEach((dataset) => {
+            dataset.data.pop;
+        });
+        //myLineChart.data.datasets[0].data.push(data);
+        //myLineChart.options = {
+        //    scales: {
+        //        xAxes: [{
+        //            time: {
+        //                unit: 'date'
+        //            },
+        //            gridLines: {
+        //                display: false
+        //            },
+        //            ticks: {
+        //                maxTicksLimit: 7
+        //            }
+        //        }],
+        //        yAxes: [{
+        //            ticks: {
+        //                min: 0,
+        //                max: 50,
+        //                maxTicksLimit: 5
+        //            },
+        //            gridLines: {
+        //                color: "rgba(0, 0, 0, .125)",
+        //            }
+        //        }],
+        //    },
+        //    legend: {
+        //        display: true
+        //    }
+        //}
+        myLineChart.update();
+    });
+
+    $(document).ready(function () {
+        var json = JSON.stringify({
+            'ProgramID': "1"
+        });
+
+        $.ajax({
+            url: '@Url.Action("GraphData", "Home")',
+            type: "POST",
+            headers: { "RequestVerificationToken": $('input[name="__RequestVerificationToken"]').val() },
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            data: json,
+            success: function (data) {
+                var result = JSON.parse(data);
+                console.log(result);
+
+                $("#chartTitle").text("Your progress for workout: " + result.WorkoutName);
+
+                var ctx = document.getElementById("myChart");
+                var myLineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: result.ExerciseName,
+                            lineTension: 0.3,
+                            backgroundColor: "rgba(2,117,216,0.2)",
+                            borderColor: "rgba(2,117,216,1)",
+                            pointRadius: 5,
+                            pointBackgroundColor: "rgba(2,117,216,1)",
+                            pointBorderColor: "rgba(255,255,255,0.8)",
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: "rgba(2,117,216,1)",
+                            pointHitRadius: 20,
+                            pointBorderWidth: 2,
+                            data: [],
+                        }],
+                    },
+                    options: {
+                        scales: {
+                            xAxes: [{
+                                time: {
+                                    unit: 'date'
+                                },
+                                gridLines: {
+                                    display: false
+                                },
+                                ticks: {
+                                    maxTicksLimit: 7
+                                }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    min: 0,
+                                    max: result.GraphMax,
+                                    maxTicksLimit: 5
+                                },
+                                gridLines: {
+                                    color: "rgba(0, 0, 0, .125)",
+                                }
+                            }],
+                        },
+                        legend: {
+                            display: true
+                        }
+                    }
+                });
+
+                myLineChart.data.labels.push(result.Label);
+                myLineChart.data.datasets[0].data.push(result.Values);
+                myLineChart.update();
+            },   
+            error: function () {
+                console.log("An error happened");
+            }
+        });
+    });
+
+    //var ctx = document.getElementById("myChart");
+    //var myLineChart = new Chart(ctx, {
+    //    type: 'line',
+    //    data: {
+    //        labels: ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"],
+    //        datasets: [{
+    //            label: "Sessions",
+    //            lineTension: 0.3,
+    //            backgroundColor: "rgba(2,117,216,0.2)",
+    //            borderColor: "rgba(2,117,216,1)",
+    //            pointRadius: 5,
+    //            pointBackgroundColor: "rgba(2,117,216,1)",
+    //            pointBorderColor: "rgba(255,255,255,0.8)",
+    //            pointHoverRadius: 5,
+    //            pointHoverBackgroundColor: "rgba(2,117,216,1)",
+    //            pointHitRadius: 20,
+    //            pointBorderWidth: 2,
+    //            data: [10, 15, 17, 20, 50, 19, 22],
+    //        },
+    //        {
+    //            label: "Test",
+    //            lineTension: 0.3,
+    //            backgroundColor: "rgba(2,117,216,0.2)",
+    //            borderColor: "rgba(2,117,216,1)",
+    //            pointRadius: 5,
+    //            pointBackgroundColor: "rgba(2,117,216,1)",
+    //            pointBorderColor: "rgba(255,255,255,0.8)",
+    //            pointHoverRadius: 5,
+    //            pointHoverBackgroundColor: "rgba(2,117,216,1)",
+    //            pointHitRadius: 20,
+    //            pointBorderWidth: 2,
+    //            data: [15, 20, 25, 30, 35, 40, 45],
+    //        }],
+    //    },
+    //    options: {
+    //        scales: {
+    //            xAxes: [{
+    //                time: {
+    //                    unit: 'date'
+    //                },
+    //                gridLines: {
+    //                    display: false
+    //                },
+    //                ticks: {
+    //                    maxTicksLimit: 7
+    //                }
+    //            }],
+    //            yAxes: [{
+    //                ticks: {
+    //                    min: 0,
+    //                    max: 50,
+    //                    maxTicksLimit: 5
+    //                },
+    //                gridLines: {
+    //                    color: "rgba(0, 0, 0, .125)",
+    //                }
+    //            }],
+    //        },
+    //        legend: {
+    //            display: true
+    //        }
+    //    }
+    //});
+    
+</script>

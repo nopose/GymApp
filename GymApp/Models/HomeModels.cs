@@ -15,27 +15,39 @@ namespace GymApp.Models
     {
         public ScheduleData schedule { get; set; }
         public GraphData graphData { get; set; }
+        public int ProgramID { get; set; }
 
-        public DashboardViewModel(List<TrainingProgram> workouts, Dictionary<int, string> exerciseNames) {
-            schedule = new ScheduleData(workouts, exerciseNames);
+        public DashboardViewModel(List<TrainingProgram> workouts) {
+            schedule = new ScheduleData(workouts);
             graphData = new GraphData();
         }
     }
 
     public class GraphData
     {
+        //public int WorkoutID { get; set; }
+        //public int ExerciseID { get; set; }
+        //public int Choice { get; set; }
     }
 
     public class ScheduleData
     {
-        public Dictionary<int, string> ExerciseNames { get; set; }
+        //public Dictionary<int, string> ExerciseNames { get; set; }
         public List<TrainingProgram> Workouts { get; set; }
         public List<Exercise> Suggested { get; set; }
+        public int Day { get; set; }
 
-        public ScheduleData(List<TrainingProgram> workouts, Dictionary<int, string> exerciseNames) {
-            ExerciseNames = exerciseNames;
+        public ScheduleData(List<TrainingProgram> workouts) {
+            //ExerciseNames = exerciseNames;
             Workouts = workouts;
         }
+    }
+
+    public class ModelDummy
+    {
+        public int workoutID { get; set; }
+
+        public ModelDummy() { }
     }
     #endregion
 

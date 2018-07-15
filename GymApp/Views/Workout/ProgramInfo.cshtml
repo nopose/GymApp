@@ -135,10 +135,11 @@
                                                                     <td>@set.weight</td>
                                                                     <td>@wunits.GetValueOrDefault(set.wunit)</td>
                                                                     <td>
+                                                                        @*<i onclick="setEdit()" class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit this Set "></i>*@
                                                                         <a class="saveRow"></a>
                                                                     </td>
                                                                     <td>
-                                                                        <i onclick="setDelete(@set.id)" class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this set"></i>
+                                                                        <i onclick="setDelete(@set.id)" class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Set"></i>
                                                                         <a class="removeRow"></a>
                                                                     </td>
                                                                 </tr>
@@ -433,6 +434,13 @@
             $("#EditExerciseForm").find("#ExerciseID").val(name);
             $("#EditExerciseForm").find("#Day").val(day);
         }
+
+        $("#EditExerciseModal").on("hidden.bs.modal", function () {
+            $("#EditExerciseForm").trigger("reset");
+            $("#EditExerciseForm").find(".validation-summary-valid ul").html("");
+            $("#EditExerciseForm").find(".field-validation-valid").empty();
+        });
+
     </script>
 }
 
