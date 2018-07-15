@@ -85,7 +85,7 @@ namespace GymApp.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
+            ViewData["Message"] = "This page is where you can find all the information you need to be able to fully understand and use this web application at its full potential.";
 
             return View();
         }

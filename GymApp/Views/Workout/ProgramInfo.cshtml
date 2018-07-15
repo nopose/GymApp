@@ -27,7 +27,8 @@
 }
 <style>
     #loading-indicator {
-        background-color:rgba(0, 0, 0, 0.7);
+        background-color:rgba(255, 255, 255, 0.7);
+        background-size:cover;
         position: absolute;
         left: 50%;
         top: 50%;
@@ -60,89 +61,108 @@
             if (i == 1)
             {
                 @:<div class="tab-pane active" id="day1">
-                }
-                else
-                {
-                    @:<div class="tab-pane" id="day@(i)" i>
-                    }
-                    @foreach (var ex in program.Exercices)
+            }
+            else
+            {
+                @:<div class="tab-pane" id="day@(i)" i>
+            }
+            if (program.Exercices.Where(d => d.day == i).Count() <= 0)
+            {
+                <div class="card" style="margin-bottom:1%; margin-top:1%;">
+                    <div class="card-header text-center" style="padding-top:2.5%;">
+                        <h5 class="card-title">You have no current exercises for this day...</h5>
+                    </div>
+                </div>
+            } 
+            else 
+            { 
+                    if (program.Exercices.Where(d => d.day == i).Count() <= 0)
                     {
-                        int j = 0;
-                        if (ex.day == i)
+                        <div class="card" style="margin-bottom:1%; margin-top:1%;">
+                            <div class="card-header text-center" style="padding-top:2.5%;">
+                                <h5 class="card-title">You have no current exercises for this day...</h5>
+                            </div>
+                        </div>
+                    } else { 
+                        @foreach (var ex in program.Exercices)
                         {
-                            <div id="exercise@(ex.id)" class="card" style="margin-bottom:1%; margin-top:1%;">
-                                <div class="card-header">
-                                    <div class="row card-group">
-                                        <div class="form-group col-md-9">
-                                            <h5 class="card-title">@names.GetValueOrDefault(ex.ExerciseID)</h5>
+                            int j = 0;
+                            if (ex.day == i)
+                            {
+                                <div id="exercise@(ex.id)"class="card" style="margin-bottom:1%; margin-top:1%;">
+                                    <div class="card-header">
+                                        <div class="row card-group">
+                                            <div class="form-group col-md-9">
+                                                <h5 class="card-title">@names.GetValueOrDefault(ex.ExerciseID)</h5>
+                                            </div>
+                                            <div class="form-group col-md-1">
+                                                <a class="nav-link" data-toggle="collapse" href="#set@(ex.id)">
+                                                    <i class="fa fa-fw fa-expand" data-toggle="tooltip" data-placement="top" title="Open Sets information"></i>
+                                                </a>
+                                            </div>
+                                            <div class="form-group col-md-1" style="padding-right:1%;">
+                                                <a class="nav-link" onclick="exerciseEdit('@program.id', '@ex.id', '@ex.ExerciseID', '@ex.day')" data-toggle="modal" data-target="#EditExerciseModal">
+                                                    <i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit this Exercise "></i>
+                                                </a>
+                                            </div>
+                                            <div class="form-group col-md-1" style="padding-right:1%;">
+                                                <a class="nav-link" onclick="exercisesDelete(@ex.id)">
+                                                    <i class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Exercise "></i>
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div class="form-group col-md-1">
-                                            <a class="nav-link" data-toggle="collapse" href="#set@(ex.id)">
-                                                <i class="fa fa-fw fa-expand" data-toggle="tooltip" data-placement="top" title="Open Sets information"></i>
-                                            </a>
-                                        </div>
-                                        <div class="form-group col-md-1" style="padding-right:1%;">
-                                            <a class="nav-link" onclick="exerciseEdit('@program.id', '@ex.id', '@ex.ExerciseID', '@ex.day')"  data-toggle="modal" data-target="#EditExerciseModal">
-                                                <i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit this Exercise "></i>
-                                            </a>
-                                        </div>
-                                        <div class="form-group col-md-1" style="padding-right:1%;">
-                                            <a class="nav-link" onclick="exercisesDelete(@ex.id)">
-                                                <i class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Exercise "></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="collapse" id="set@(ex.id)">
-                                        <div class="card card-body">
-                                            <table id="ExerciseTable" tag="@(ex.id)" class="table table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Amount</th>
-                                                        <th scope="col">Unit</th>
-                                                        <th scope="col">Weight</th>
-                                                        <th scope="col">Unit</th>
-                                                        <th scope="col"></th>
-                                                        <th scope="col"></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach (var set in ex.SetInfo)
-                                                    {
-                                                        @using (Html.BeginForm("AddSets", "Workout", FormMethod.Post, new { id = "AddSetsTo" }))
+                                        <div class="collapse" id="set@(ex.id)">
+                                            <div class="card card-body">
+                                                <table id="ExerciseTable" tag="@(ex.id)" class="table table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Amount</th>
+                                                            <th scope="col">Unit</th>
+                                                            <th scope="col">Weight</th>
+                                                            <th scope="col">Unit</th>
+                                                            <th scope="col"></th>
+                                                            <th scope="col"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var set in ex.SetInfo)
                                                         {
-                                                            <tr id="@(set.id)">
-                                                                <td>@set.amount</td>
-                                                                <td>@aunits.GetValueOrDefault(set.aunit)</td>
-                                                                <td>@set.weight</td>
-                                                                <td>@wunits.GetValueOrDefault(set.wunit)</td>
-                                                                <td>
-                                                                    <a class="saveRow"></a>
-                                                                </td>
-                                                                <td>
-                                                                    <i onclick="setDelete(@set.id)" class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this set"></i>
-                                                                    <a class="removeRow"></a>
-                                                                </td>
-                                                            </tr>
-                                                            @*<div class="SuccessIF text-success"></div>
-                                                            <div class="ErrorIf text-danger"></div>*@
+                                                            @using (Html.BeginForm("AddSets", "Workout", FormMethod.Post, new { id = "AddSetsTo" }))
+                                                            {
+                                                                <tr id="@(set.id)">
+                                                                    <td>@set.amount</td>
+                                                                    <td>@aunits.GetValueOrDefault(set.aunit)</td>
+                                                                    <td>@set.weight</td>
+                                                                    <td>@wunits.GetValueOrDefault(set.wunit)</td>
+                                                                    <td>
+                                                                        <a class="saveRow"></a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <i onclick="setDelete(@set.id)" class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this set"></i>
+                                                                        <a class="removeRow"></a>
+                                                                    </td>
+                                                                </tr>
+                                                                @*<div class="SuccessIF text-success"></div>
+                                                                <div class="ErrorIf text-danger"></div>*@
+                                                            }
                                                         }
-                                                    }
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr>
-                                                        <td colspan="5" style="text-align: left;">
-                                                            <input type="button" class="btn btn-lg btn-block btn-primary addrow" value="Add Set" />
-                                                        </td>
-                                                    </tr>
-                                                    <tr></tr>
-                                                </tfoot>
-                                            </table>
-                                            <p id="success" class="SuccessIF text-success"></p>
-                                            <p id="errorAdd" class="ErrorIf text-danger"></p>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td colspan="5" style="text-align: left;">
+                                                                <input type="button" class="btn btn-lg btn-block btn-primary addrow" value="Add Set" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr></tr>
+                                                    </tfoot>
+                                                </table>
+                                                <p id="success" class="SuccessIF text-success"></p>
+                                                <p id="errorAdd" class="ErrorIf text-danger"></p >
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
                         }
                     }@:</div>
             }
