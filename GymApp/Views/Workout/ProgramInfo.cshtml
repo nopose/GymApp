@@ -37,6 +37,8 @@
 <h2>@ViewData["Title"]</h2>
 <hr />
 <div class="container">
+    
+<div class="mymodal"><img src="~/images/45.gif" id="big-loading-indicator" style="display:none" /></div>
     @using (Html.BeginForm("AddSets", "Workout", FormMethod.Post, new { id = "AddSetsForm" }))
     {
     }
@@ -61,118 +63,125 @@
             if (i == 1)
             {
                 @:<div class="tab-pane active" id="day1">
-            }
-            else
-            {
-                @:<div class="tab-pane" id="day@(i)" i>
-            }
-            if (program.Exercices.Where(d => d.day == i).Count() <= 0)
-            {
-                <div class="card" style="margin-bottom:1%; margin-top:1%;">
-                    <div class="card-header text-center" style="padding-top:2.5%;">
-                        <h5 class="card-title">You currently have no exercises for this day</h5>
-                    </div>
-                </div>
-            } 
-            else 
-            { 
+                }
+                else
+                {
+                    @:<div class="tab-pane" id="day@(i)" i>
+                    }
                     if (program.Exercices.Where(d => d.day == i).Count() <= 0)
                     {
                         <div class="card" style="margin-bottom:1%; margin-top:1%;">
                             <div class="card-header text-center" style="padding-top:2.5%;">
-                                <h5 class="card-title">You have no current exercises for this day...</h5>
+                                <h5 class="card-title">You currently have no exercises for this day</h5>
                             </div>
                         </div>
-                    } else { 
-                        @foreach (var ex in program.Exercices)
+                    }
+                    else
+                    {
+                        if (program.Exercices.Where(d => d.day == i).Count() <= 0)
                         {
-                            int j = 0;
-                            if (ex.day == i)
+                            <div class="card" style="margin-bottom:1%; margin-top:1%;">
+                                <div class="card-header text-center" style="padding-top:2.5%;">
+                                    <h5 class="card-title">You have no current exercises for this day...</h5>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var ex in program.Exercices)
                             {
-                                <div id="exercise@(ex.id)"class="card" style="margin-bottom:1%; margin-top:1%;">
-                                    <div class="card-header">
-                                        <div class="row card-group">
-                                            <div class="form-group col-md-9">
-                                                <h5 class="card-title">@names.GetValueOrDefault(ex.ExerciseID)</h5>
+                                int j = 0;
+                                if (ex.day == i)
+                                {
+                                    <div id="exercise@(ex.id)" class="card" style="margin-bottom:1%; margin-top:1%;">
+                                        <div class="card-header">
+                                            <div class="row card-group">
+                                                <div class="form-group col-md-9">
+                                                    <h5 class="card-title">@names.GetValueOrDefault(ex.ExerciseID)</h5>
+                                                </div>
+                                                <div class="form-group col-md-1">
+                                                    <a class="nav-link" data-toggle="collapse" href="#set@(ex.id)">
+                                                        <i class="fa fa-fw fa-expand" data-toggle="tooltip" data-placement="top" title="Open Sets information"></i>
+                                                    </a>
+                                                </div>
+                                                <div class="form-group col-md-1" style="padding-right:1%;">
+                                                    <a class="nav-link" onclick="exerciseEdit('@program.id', '@ex.id', '@ex.ExerciseID', '@ex.day')" data-toggle="modal" data-target="#EditExerciseModal">
+                                                        <i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit this Exercise "></i>
+                                                    </a>
+                                                </div>
+                                                <div class="form-group col-md-1" style="padding-right:1%;">
+                                                    <a class="nav-link" onclick="exercisesDelete(@ex.id)">
+                                                        <i class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Exercise "></i>
+                                                    </a>
+                                                </div>
                                             </div>
-                                            <div class="form-group col-md-1">
-                                                <a class="nav-link" data-toggle="collapse" href="#set@(ex.id)">
-                                                    <i class="fa fa-fw fa-expand" data-toggle="tooltip" data-placement="top" title="Open Sets information"></i>
-                                                </a>
-                                            </div>
-                                            <div class="form-group col-md-1" style="padding-right:1%;">
-                                                <a class="nav-link" onclick="exerciseEdit('@program.id', '@ex.id', '@ex.ExerciseID', '@ex.day')" data-toggle="modal" data-target="#EditExerciseModal">
-                                                    <i class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit this Exercise "></i>
-                                                </a>
-                                            </div>
-                                            <div class="form-group col-md-1" style="padding-right:1%;">
-                                                <a class="nav-link" onclick="exercisesDelete(@ex.id)">
-                                                    <i class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Exercise "></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <div class="collapse" id="set@(ex.id)">
-                                            <div class="card card-body">
-                                                <table id="ExerciseTable" tag="@(ex.id)" class="table table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th scope="col">Amount</th>
-                                                            <th scope="col">Unit</th>
-                                                            <th scope="col">Weight</th>
-                                                            <th scope="col">Unit</th>
-                                                            <th scope="col"></th>
-                                                            <th scope="col"></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (var set in ex.SetInfo)
-                                                        {
-                                                            @using (Html.BeginForm("AddSets", "Workout", FormMethod.Post, new { id = "AddSetsTo" }))
+                                            <div class="collapse" id="set@(ex.id)">
+                                                <div class="card card-body">
+                                                    <table id="ExerciseTable" tag="@(ex.id)" class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Amount</th>
+                                                                <th scope="col">Unit</th>
+                                                                <th scope="col">Weight</th>
+                                                                <th scope="col">Unit</th>
+                                                                <th scope="col"></th>
+                                                                <th scope="col"></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var set in ex.SetInfo)
                                                             {
-                                                                <tr id="@(set.id)">
-                                                                    <td>@set.amount</td>
-                                                                    <td>@aunits.GetValueOrDefault(set.aunit)</td>
-                                                                    <td>@set.weight</td>
-                                                                    <td>@wunits.GetValueOrDefault(set.wunit)</td>
-                                                                    <td>
-                                                                        @*<i onclick="setEdit()" class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit this Set "></i>*@
-                                                                        <a class="saveRow"></a>
-                                                                    </td>
-                                                                    <td>
-                                                                        <i onclick="setDelete(@set.id)" class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Set"></i>
-                                                                        <a class="removeRow"></a>
-                                                                    </td>
-                                                                </tr>
-                                                                @*<div class="SuccessIF text-success"></div>
-                                                                <div class="ErrorIf text-danger"></div>*@
+                                                                @using (Html.BeginForm("AddSets", "Workout", FormMethod.Post, new { id = "AddSetsTo" }))
+                                                                {
+                                                                    <tr id="@(set.id)">
+                                                                        <td>@set.amount</td>
+                                                                        <td>@aunits.GetValueOrDefault(set.aunit)</td>
+                                                                        <td>@set.weight</td>
+                                                                        <td>@wunits.GetValueOrDefault(set.wunit)</td>
+                                                                        <td>
+                                                                            @*<i onclick="setEdit()" class="fa fa-edit" data-toggle="tooltip" data-placement="top" title="Edit this Set "></i>*@
+                                                                            <a class="saveRow"></a>
+                                                                        </td>
+                                                                        <td>
+                                                                            <i onclick="setDelete(@set.id)" class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="Delete this Set"></i>
+                                                                            <a class="removeRow"></a>
+                                                                        </td>
+                                                                    </tr>
+                                                                    @*<div class="SuccessIF text-success"></div>
+                                                                    <div class="ErrorIf text-danger"></div>*@
+                                                                }
                                                             }
-                                                        }
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <td colspan="5" style="text-align: left;">
-                                                                <input type="button" class="btn btn-lg btn-block btn-primary addrow" value="Add Set" />
-                                                            </td>
-                                                        </tr>
-                                                        <tr></tr>
-                                                    </tfoot>
-                                                </table>
-                                                <p id="success" class="SuccessIF text-success"></p>
-                                                <p id="errorAdd" class="ErrorIf text-danger"></p >
+                                                        </tbody>
+                                                        <tfoot>
+                                                            <tr>
+                                                                <td colspan="5" style="text-align: left;">
+                                                                    <input type="button" class="btn btn-lg btn-block btn-primary addrow" value="Add Set" />
+                                                                </td>
+                                                            </tr>
+                                                            <tr></tr>
+                                                        </tfoot>
+                                                    </table>
+                                                    <p id="success" class="SuccessIF text-success"></p>
+                                                    <p id="errorAdd" class="ErrorIf text-danger"></p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                }
                             }
                         }
                     }
+
+                @:</div>
             }
-            
-            @:</div>
-        }
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-primary col-md-5" data-toggle="modal" data-target="#AddExerciseModal" onclick="exerciseAdd('@program.id')">Add an Exercise to this Workout day</button>
+            </div>
+        </div>
     </div>
     <div class="row" style="margin-top:10%;">
-        @Html.ActionLink("Back to workouts", "Workouts", "Workout", null, new { @class = "btn btn-primary col-md-3" })
+        @Html.ActionLink("Back to Workouts", "Workouts", "Workout", null, new { @class = "btn btn-primary col-md-3" })
     </div>
 
     <div class="modal fade" id="EditExerciseModal" tabindex="-1" role="dialog" aria-labelledby="ExerciseModal" aria-hidden="true">
@@ -220,6 +229,86 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="AddExerciseModal" tabindex="-1" role="dialog" aria-labelledby="ExerciseModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ExerciseModal">Adding an exercise to a Workout</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                @using (Html.BeginForm("AddExerciseToDay", "Workout", FormMethod.Post, new { id = "AddExerciseForm" }))
+                {
+                    <div class="modal-body">
+                        <input id="idE" asp-for="UserID" hidden value="@user.Id" />
+                        <input id="pidE" asp-for="ProgramID" hidden />
+                        <input id="dayE" asp-for="Day" hidden />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="ExerciseID"></label>
+                            <select id="ExerciseIDE" asp-for="ExerciseID" class="form-control js-example-basic-single">
+                                <option value="-1">Choose an Exercise..</option>
+                                @foreach (var item in exercises)
+                                {
+                                    <option value="@item.id">@item.name</option>
+                                }
+                            </select>
+                            <span asp-validation-for="ExerciseID" class="text-danger"></span>
+                        </div>
+                        <div class="SetInfo form-row col-md-12">
+                            <div class="form-group col-md-3">
+                                <label asp-for="Amount"></label>
+                                <input type="number" min="0" asp-for="Amount" class="form-control" />
+                                <span asp-validation-for="Amount" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label asp-for="Aunit"></label>
+                                <select asp-for="Aunit" class="form-control">
+                                    <option value="0" selected>Choose from..</option>
+                                    <option value="1">Kilometers</option>
+                                    <option value="2">Miles</option>
+                                    <option value="3">Minutes</option>
+                                    <option value="4">Repetitions</option>
+                                </select>
+                                <span asp-validation-for="Aunit" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label asp-for="Weight"></label>
+                                <input type="number" asp-for="Weight" class="form-control" />
+                                <span asp-validation-for="Weight" class="text-danger"></span>
+                                <em style="font-size:80%;">Optional</em>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label asp-for="Wunit"></label>
+                                <select asp-for="Wunit" class="form-control">
+                                    <option value="0" selected>Choose from..</option>
+                                    <option value="1">Body Weight</option>
+                                    <option value="2">Kilograms</option>
+                                    <option value="3">Pounds</option>
+                                </select>
+                                <span asp-validation-for="Wunit" class="text-danger"></span>
+                                <em style="font-size:80%;">Optional</em>
+                            </div>
+                        </div>
+                        <div class="form-row col-md-12 text-center">
+                            <em style="font-size:90%;">
+                                If you want to add more statistics to this exercise, you can do it
+                                in the Workout information. Those "first statistics" allow us to set a base for your account
+                                (e.g. It's your current maximum for this exercise).
+                            </em>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Add</button>
                     </div>
                 }
             </div>
@@ -439,6 +528,23 @@
             $("#EditExerciseForm").trigger("reset");
             $("#EditExerciseForm").find(".validation-summary-valid ul").html("");
             $("#EditExerciseForm").find(".field-validation-valid").empty();
+        });
+
+        function exerciseAdd(pid) {
+            document.getElementById('pidE').value = pid;
+            var day = $(".nav-tabs").find(".nav-link.active").html();
+            day = day.substr(day.length - 1)
+            console.log(day.substr(day.length-1));
+            document.getElementById('dayE').value = day;
+        }
+
+        $("#AddExerciseModal").on("hidden.bs.modal", function () {
+            $("#AddExerciseForm").trigger("reset");
+            $("#AddExerciseForm").find(".validation-summary-valid ul").html("");
+            $("#AddExerciseForm").find(".field-validation-valid").empty();
+            $("#AddExerciseForm").find("input").val("");
+            $("#AddExerciseForm").find("select").val(0);
+            $("#ExerciseIDE").val(-1);
         });
 
     </script>

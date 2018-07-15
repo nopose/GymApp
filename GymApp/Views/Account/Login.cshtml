@@ -13,13 +13,26 @@
 @{
     ViewData["Title"] = "Login";
 }
+<style>
+    #loading-indicator {
+        background-color: rgba(255, 255, 255, 0.7);
+        background-size: cover;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        height:50%;
+        width: 50%;
+        z-index: 1000
+    }
+</style>
 @*<h2>@ViewData["Title"]</h2>*@
 <div class="container">
     <div class="card card-login mx-auto mt-5">
         <div class="card-header">Login</div>
         <div class="card-body">
             <section>
-                <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                <div class="mymodal"><img src="~/images/45.gif" id="loading-indicator" style="display:none" /></div>
+                <form id="form" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
                     <h4>Use a local account to log in.</h4>
                     <hr />
                     <div asp-validation-summary="All" class="text-danger"></div>
@@ -34,20 +47,20 @@
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
                     @*<div class="form-group">
-                        <div class="checkbox">
-                            <label asp-for="RememberMe">
-                                <input asp-for="RememberMe" />
-                                @Html.DisplayNameFor(m => m.RememberMe)
-                            </label>
-                        </div>
-                    </div>*@
+                <div class="checkbox">
+                    <label asp-for="RememberMe">
+                        <input asp-for="RememberMe" />
+                        @Html.DisplayNameFor(m => m.RememberMe)
+                    </label>
+                </div>
+            </div>*@
                     <div class="form-group">
                         <button type="submit" class="btn btn-default">Log in</button>
                     </div>
                     <div class="form-group">
                         @*<p>
-                            <a asp-action="ForgotPassword">Forgot your password?</a>
-                        </p>*@
+                    <a asp-action="ForgotPassword">Forgot your password?</a>
+                </p>*@
                         <p>
                             <a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">Register as a new user?</a>
                         </p>
@@ -60,4 +73,11 @@
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
 }
+<script>
+
+    $("#form").submit(function () {
+        $('#loading-indicator').show();
+    });
+
+</script>
 

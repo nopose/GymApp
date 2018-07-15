@@ -330,6 +330,88 @@ namespace GymApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddExerciseToDay(WorkoutViewModel model, string returnUrl = null)
+        {
+            ModelState.Remove("WorkoutName");
+            ModelState.Remove("WorkoutDescription");
+            ModelState.Remove("StartDate");
+            ModelState.Remove("EndDate");
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                string userID = _userManager.GetUserId(User);
+                int programID = model.ProgramID;
+                int exerciseID = model.ExerciseID;
+                int day = model.Day;
+                int amount = model.Amount;
+                int aunit = model.Aunit;
+                int? weight = model.Weight;
+                int? wunit = model.Wunit;
+
+                if (weight != null && wunit < 1)
+                {
+                    TempData["ErrorMessage"] = "If you enter a weight, you need to enter the weight unit as well.";
+                    ViewBag.Exercises = ExercisesList;
+                    ViewBag.Workouts = getWorkoutsForUser();
+                    return View("Program", model);
+                }
+
+                TrainingProgram tp = await _context.Workouts.FirstOrDefaultAsync(W => W.id == model.ProgramID && W.uid == _userManager.GetUserId(User));
+                ExerciseSets e_set = new ExerciseSets
+                {
+                    amount = amount,
+                    aunit = aunit,
+                    weight = (weight == null ? 0 : (int)weight),
+                    wunit = (wunit == null ? 0 : (int)wunit)
+                };
+
+                ProgramExercises p_ex = new ProgramExercises
+                {
+                    ExerciseID = exerciseID,
+                    day = day
+                };
+
+                p_ex.SetInfo.Add(e_set);
+
+                tp.Exercices.Add(p_ex);
+
+                _context.Workouts.Update(tp);
+                await _context.SaveChangesAsync();
+
+                Dictionary<int, string> exerciseNames = new Dictionary<int, string>();
+                
+                var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+                var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+                List<Exercise> exercisesFromAPI = getExercisesFromAPI();
+
+                foreach (var ex in tp.Exercices)
+                {
+                    foreach (var real_ex in exercisesFromAPI)
+                    {
+                        if (ex.ExerciseID == real_ex.id && (exerciseNames.GetValueOrDefault(ex.ExerciseID) == null))
+                        {
+                            exerciseNames.Add(ex.ExerciseID, real_ex.name);
+                        }
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Your Exercise has been added successfully!";
+                ViewBag.Program = tp;
+                ViewBag.Names = exerciseNames;
+                ViewBag.Exercises = ExercisesList;
+                return View("ProgramInfo", new WorkoutViewModel());
+            }
+            ViewBag.Exercises = ExercisesList;
+            ViewBag.Workouts = getWorkoutsForUser();
+            TempData["ErrorMessage"] = "Oops... Something hapenned...";
+            return View("Program", model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteExercise([FromBody]WorkoutViewModel data)
         {
             TrainingProgram tp = _context.Workouts.FirstOrDefault(W => W.id == data.ProgramID);
