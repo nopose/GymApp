@@ -65,17 +65,31 @@
                                     <div class="card-body-icon">
                                         <i class="fa fa-heartbeat"></i>
                                     </div>
-                                    <div class="mr-5">Exercises today for workout: @work.name</div>
-                                    <div class="mr-5">
-                                        <ul>
-                                            @foreach (ProgramExercises ex in work.Exercices)
-                                            {
-                                            <li>
-                                                @Html.ActionLink(Model.schedule.ExerciseNames.GetValueOrDefault(ex.ExerciseID), "ExerciseDetail", "Home", new { id = ex.id }, new { @class = "text-white", data_toggle = "tooltip", data_placement = "top", title = "More info about this Exercise" })
-                                            </li>
-                                            }
-                                        </ul>
-                                    </div>
+                                    <div class="mr-5">Exercises today for workout: <span class="font-weight-bold">@work.name</span></div>
+                                    @if (work.ActualExercisesCount > 0)
+                                    {
+                                        <div class="mr-5">
+                                            <ul>
+                                                @foreach (ProgramExercises ex in work.Exercices)
+                                                {
+
+                                                    var name = Model.schedule.ExerciseNames.GetValueOrDefault(ex.ExerciseID);
+                                                    if (name != null)
+                                                    {
+                                                        <li>
+                                                            @Html.ActionLink(name, "ExerciseDetail", "Home", new { id = ex.ExerciseID }, new { @class = "text-white", data_toggle = "tooltip", data_placement = "top", title = "More info about this Exercise" })
+                                                        </li>
+                                                    }
+
+                                                }
+                                            </ul>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="mr-5">No exercises today for this workout</div>
+
+                                    }
                                 </div>
                                 <a class="card-footer text-white clearfix small z-1" href="@Url.Action("WorkoutInfo", "Workout", new { id = work.id})">
                                     <span class="float-left">View full workout</span>

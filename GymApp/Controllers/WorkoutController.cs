@@ -73,6 +73,7 @@ namespace GymApp.Controllers
                 }
                 ViewBag.Program = program;
                 ViewBag.Names = exerciseNames;
+                ViewBag.Exercises = ExercisesList;
                 return View("ProgramInfo", new WorkoutViewModel());
             }
             TempData["ErrorMessage"] = "The Workout you've selected does not exist...";
@@ -215,6 +216,59 @@ namespace GymApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        public IActionResult EditWorkout(WorkoutViewModel model, string returnUrl = null)
+        {
+            ModelState.Remove("ExerciseID");
+            ModelState.Remove("Day");
+            ModelState.Remove("Amount");
+            ModelState.Remove("Aunit");
+
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                string userID = _userManager.GetUserId(User);
+                DateTime StartDate = model.StartDate;
+                DateTime EndDate = model.EndDate;
+
+                TrainingProgram tp = _context.Workouts.FirstOrDefault(W => W.id == model.ProgramID);
+
+                if (!(StartDate.Date >= DateTime.Now.Date))
+                {
+                    TempData["ErrorMessage"] = "The Start Date must be greater or equal than today's date.";
+                    ViewBag.Exercises = ExercisesList;
+                    ViewBag.Workouts = getWorkoutsForUser();
+                    return View("Program", model);
+                }
+                if (!(EndDate > StartDate))
+                {
+                    TempData["ErrorMessage"] = "The Start Date must be greater than the End Date";
+                    ViewBag.Exercises = ExercisesList;
+                    ViewBag.Workouts = getWorkoutsForUser();
+                    return View("Program", model);
+                }
+
+                tp.uid = userID;
+                tp.name = model.WorkoutName;
+                tp.description = model.WorkoutDescription;
+                tp.StartDate = StartDate;
+                tp.EndDate = EndDate;
+
+                _context.Workouts.Update(tp);
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Your Workout has been edited successfully!";
+                ViewBag.Exercises = ExercisesList;
+                ViewBag.Workouts = getWorkoutsForUser();
+                return View("Program");
+            }
+            TempData["ErrorMessage"] = "Oops... Something went wrong..";
+            ViewBag.Exercises = ExercisesList;
+            ViewBag.Workouts = getWorkoutsForUser();
+            return View("Program");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddExerciseToWorkout(WorkoutViewModel model, string returnUrl = null)
         {
             ModelState.Remove("WorkoutName");
@@ -295,6 +349,61 @@ namespace GymApp.Controllers
             _context.SaveChanges();
 
             return Json("Success.");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditExercise(WorkoutViewModel model, string returnUrl = null)
+        {
+            ModelState.Remove("Amount");
+            ModelState.Remove("Aunit"); ModelState.Remove("WorkoutName");
+            ModelState.Remove("WorkoutDescription");
+            ModelState.Remove("StartDate");
+            ModelState.Remove("EndDate");
+
+            Dictionary<int, string> exerciseNames = new Dictionary<int, string>();
+            TrainingProgram tp = await _context.Workouts.FirstOrDefaultAsync(W => W.id == model.ProgramID && W.uid == _userManager.GetUserId(User));
+
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+            List<Exercise> exercisesFromAPI = getExercisesFromAPI();
+
+            foreach (var ex in tp.Exercices)
+            {
+                foreach (var real_ex in exercisesFromAPI)
+                {
+                    if (ex.ExerciseID == real_ex.id && (exerciseNames.GetValueOrDefault(ex.ExerciseID) == null))
+                    {
+                        exerciseNames.Add(ex.ExerciseID, real_ex.name);
+                    }
+                }
+            }
+
+
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                ProgramExercises ex = exer.FirstOrDefault(x => x.id == model.DBExerciseID);
+                ex.ExerciseID = model.ExerciseID;
+                ex.day = model.Day;
+
+
+                _context.PExercises.Update(ex);
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Your Exercise has been edited successfully!";
+                ViewBag.Program = tp;
+                ViewBag.Names = exerciseNames;
+                ViewBag.Exercises = ExercisesList;
+                return View("ProgramInfo", new WorkoutViewModel());
+            }
+            TempData["ErrorMessage"] = "Oops... Something went wrong..";
+            ViewBag.Program = tp;
+            ViewBag.Names = exerciseNames;
+            ViewBag.Exercises = ExercisesList;
+            return View("ProgramInfo", model);
         }
 
         private List<TrainingProgram> getWorkoutsForUser()

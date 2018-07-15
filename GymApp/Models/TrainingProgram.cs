@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,6 +21,10 @@ namespace GymApp.Models
         public DateTime EndDate { get; set; }
 
         public List<ProgramExercises> Exercices { get; set; } = new List<ProgramExercises>();
+
+        [NotMapped]
+        public int ActualExercisesCount { get; set; } = 0;
+
     }
 
     public class ProgramExercises

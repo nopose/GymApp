@@ -10,6 +10,7 @@ namespace GymApp.Models
     {
         public string UserID { get; set; }
         public int ProgramID { get; set; }
+        public int DBExerciseID { get; set; }
         public int SetID { get; set; }
 
         [Required]

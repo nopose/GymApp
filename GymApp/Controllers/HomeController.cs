@@ -49,16 +49,21 @@ namespace GymApp.Controllers
             var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
 
             List<Exercise> exercisesFromAPI = getExercisesFromAPI();
-
+            
             foreach (var pro in workouts)
             {
+                int day = calculateDayNumber(pro.StartDate, pro.EndDate);
                 foreach (var ex in pro.Exercices)
                 {
-                    foreach (var real_ex in exercisesFromAPI)
+                    if(ex.day == day)
                     {
-                        if (ex.ExerciseID == real_ex.id && (exerciseNames.GetValueOrDefault(ex.ExerciseID) == null))
+                        foreach (var real_ex in exercisesFromAPI)
                         {
-                            exerciseNames.Add(ex.ExerciseID, real_ex.name);
+                            if (ex.ExerciseID == real_ex.id && (exerciseNames.GetValueOrDefault(ex.ExerciseID) == null))
+                            {
+                                exerciseNames.Add(ex.ExerciseID, real_ex.name);
+                                pro.ActualExercisesCount++;
+                            }
                         }
                     }
                 }
@@ -148,15 +153,6 @@ namespace GymApp.Controllers
             return View("Exercises", model);
         }
 
-        //public string NavExercises()
-        //{
-        //    string result = "";
-
-        //    var user = _context.Users.Find("5cd48358-8991-4359-9234-6f0d33354901");
-
-        //    return result;
-        //}
-
         public IActionResult ExerciseDetail(int id)
         {
             ExerciseDetailViewModel model = new ExerciseDetailViewModel(id);
@@ -216,7 +212,7 @@ namespace GymApp.Controllers
                 if(model.Search == null)
                     return RedirectToAction("Exercises");
                 else
-                    return RedirectToAction("SearchExercises");
+                    return RedirectToAction("Exercises");
             }
             ViewBag.Workouts = getWorkoutsForUser();
             TempData["ErrorMessage"] = "Oops... Something hapenned...";
@@ -267,6 +263,20 @@ namespace GymApp.Controllers
             }
 
             return cacheExercises.results;
+        }
+
+        //calculate the day number to match with the workout
+        //return 0 if invalid for some reason
+        private static int calculateDayNumber(DateTime workoutStart, DateTime workoutEnd)
+        {
+            DateTime today = DateTime.Now;
+
+            //make sure the workout is started and not ended
+            if(workoutStart.Date <= today.Date && workoutEnd.Date >= today.Date)
+            {
+                return (((today - workoutStart).Days % 7) + 1);
+            }
+            return 0;
         }
     }
 }
