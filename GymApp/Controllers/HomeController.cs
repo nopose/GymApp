@@ -332,6 +332,42 @@ namespace GymApp.Controllers
         }
 
 
+        [HttpGet]
+        public ActionResult Calendar()
+        {
+            return View(new CalendarViewModel());
+        }
+
+        public JsonResult GetEvents(DateTime start, DateTime end)
+        {
+            var viewModel = new CalendarViewModel();
+            var events = new List<CalendarViewModel>();
+            start = DateTime.Today.AddDays(-14);
+            end = DateTime.Today.AddDays(-11);
+
+            for (var i = 1; i <= 5; i++)
+            {
+                events.Add(new CalendarViewModel()
+                {
+                    id = i,
+                    title = "Event " + i,
+                    start = start.ToString(),
+                    end = end.ToString(),
+                    allDay = false
+                });
+
+                start = start.AddDays(7);
+                end = end.AddDays(7);
+            }
+
+
+            return Json(JsonConvert.SerializeObject(events));
+        }
+
+
+
+
+
         private List<TrainingProgram> getWorkoutsForUser()
         {
             List<TrainingProgram> workouts = new List<TrainingProgram>();
