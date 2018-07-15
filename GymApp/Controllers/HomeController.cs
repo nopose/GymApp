@@ -117,7 +117,7 @@ namespace GymApp.Controllers
                 }
             }
 
-            SelectList list = new SelectList(filtered, "id", "Name", 0);
+            SelectList list = new SelectList(filtered, "ExerciseID", "Name", 0);
             return Json(JsonConvert.SerializeObject(list));
         }
 
@@ -266,22 +266,22 @@ namespace GymApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult GraphData()
+        public IActionResult GraphData([FromBody]ModelDummy data)
         {
-            List<TrainingProgram> workouts = getWorkoutsForUser();
+            TrainingProgram program = _context.Workouts.FirstOrDefault(W => W.id == data.workoutID && W.uid == _userManager.GetUserId(User));
 
             var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
 
             var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
 
             List<Exercise> exercisesFromAPI = getExercisesFromAPI();
-            int exerciseID = workouts[0].Exercices[0].ExerciseID;
-            workouts[0].Exercices.Sort((x, y) => x.day.CompareTo(y.day));
+            int exerciseID = data.ExerciseID;
+            program.Exercices.Sort((x, y) => x.day.CompareTo(y.day));
             int max = 0;
             int graphMax = 0;
             int choice = 0;
-            GraphDataJson data = new GraphDataJson();
-            foreach (ProgramExercises ex in workouts[0].Exercices)
+            GraphDataJson result = new GraphDataJson();
+            foreach (ProgramExercises ex in program.Exercices)
             {
                 if(ex.ExerciseID == exerciseID)
                 {
@@ -295,8 +295,8 @@ namespace GymApp.Controllers
                                 if (max > graphMax)
                                     graphMax = max;
                             }
-                            data.Label.Add("Day " + ex.day);
-                            data.Values.Add(max.ToString());
+                            result.Label.Add("Day " + ex.day);
+                            result.Values.Add(max.ToString());
                             break;
                         case 1:
                             foreach (ExerciseSets set in ex.SetInfo)
@@ -306,8 +306,8 @@ namespace GymApp.Controllers
                                 if (max > graphMax)
                                     graphMax = max;
                             }
-                            data.Label.Add("Day " + ex.day);
-                            data.Values.Add(max.ToString());
+                            result.Label.Add("Day " + ex.day);
+                            result.Values.Add(max.ToString());
                             break;
                     }
                     
@@ -325,10 +325,10 @@ namespace GymApp.Controllers
             //        }
             //    }
             //}
-            data.GraphMax = graphMax * 2;
-            data.WorkoutName = workouts[0].name;
-            data.ExerciseName = getExerciseName(exerciseID);
-            return Json(JsonConvert.SerializeObject(data));
+            result.GraphMax = graphMax * 2;
+            result.WorkoutName = program.name;
+            result.ExerciseName = getExerciseName(exerciseID);
+            return Json(JsonConvert.SerializeObject(result));
         }
 
 

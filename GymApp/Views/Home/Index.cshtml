@@ -1,5 +1,16 @@
 ﻿@model DashboardViewModel
 
+<style>
+    #loading-indicator {
+        background-color: rgba(255, 255, 255, 0.7);
+        background-size: cover;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1000
+    }
+</style>
+
         <div class="container-fluid">
             <h1>My Dashboard</h1>
             <hr>
@@ -170,36 +181,38 @@
 
 
 
-    <div class="container-fluid">
-        <!-- Area Chart -->
-        <div class="card mb-3">
-            <div class="card-header">
-                <i class="fa fa-area-chart"></i> <span id="chartTitle">Your Progress</span>
-            </div>
-            <div class="card-body">
-                <canvas id="myChart" width="100%" height="30"></canvas>
-            </div>
-            <div class="card-footer small text-muted">
-                <div class="row">
-                    <div class="col-md-3">
-                        <select id="workoutSelect" onchange="javascript:getList(this.value);">
-                            <option value="0">Choose a Workout</option>
-                            @foreach (TrainingProgram work in Model.schedule.Workouts)
-                            {
-                                <option value="@work.id">@work.name</option>
-                            }
-                        </select>
-                    </div>
-                    <div id="exerciseDiv" style="display:none;">
-                        <select id="exerciseSelect" onchange="javascript:showButton(this.value);"></select>
-                    </div>
-                    <div class="col-md-3" id="buttonDiv" style="display:none;">
-                        <button id="test">Generate Graph</button>
+        <div class="container-fluid">
+            <!-- Area Chart -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <i class="fa fa-area-chart"></i> <span id="chartTitle">Your Progress</span>
+                </div>
+                <div class="card-body">
+                    <div class="mymodal"><img src="~/images/45.gif" id="loading-indicator" style="display:none" /></div>
+                    <canvas id="myChart" width="100%" height="30"></canvas>
+                </div>
+                <div class="card-footer small text-muted">
+                    <h6>Choose a workout and an exercise to display your progress</h6>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <select id="workoutSelect" onchange="javascript:getList(this.value);">
+                                <option value="0">Choose a Workout</option>
+                                @foreach (TrainingProgram work in Model.schedule.Workouts)
+                                {
+                                    <option value="@work.id">@work.name</option>
+                                }
+                            </select>
+                        </div>
+                        <div id="exerciseDiv" style="display:none;">
+                            <select id="exerciseSelect" onchange="javascript:showButton(this.value);"></select>
+                        </div>
+                        <div class="col-md-3" id="buttonDiv" style="display:none;">
+                            <button id="test">Generate Graph</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     <!-- /.container-fluid-->
     <!-- /.content-wrapper-->
     @*<footer class="sticky-footer">
@@ -242,8 +255,8 @@
     }
 
     function getList(_id) {
+        $("#buttonDiv").hide();
         if (_id == 0) {
-            $("#buttonDiv").hide();
             $("#exerciseDiv").hide();
         }
         else {
@@ -274,7 +287,7 @@
                 error: function (reponse) {
                     alert("error : " + reponse);
                 }
-                });
+            });
         }
     }
 
@@ -282,48 +295,51 @@
 
 
     //Chart
-    $("#test").click(function () { 
-        var data = [50];
-        var label = ["Day 8"];
-        myLineChart.data.labels.pop();
-        myLineChart.data.datasets.forEach((dataset) => {
-            dataset.data.pop;
-        });
-        //myLineChart.data.datasets[0].data.push(data);
-        //myLineChart.options = {
-        //    scales: {
-        //        xAxes: [{
-        //            time: {
-        //                unit: 'date'
-        //            },
-        //            gridLines: {
-        //                display: false
-        //            },
-        //            ticks: {
-        //                maxTicksLimit: 7
-        //            }
-        //        }],
-        //        yAxes: [{
-        //            ticks: {
-        //                min: 0,
-        //                max: 50,
-        //                maxTicksLimit: 5
-        //            },
-        //            gridLines: {
-        //                color: "rgba(0, 0, 0, .125)",
-        //            }
-        //        }],
-        //    },
-        //    legend: {
-        //        display: true
-        //    }
-        //}
-        myLineChart.update();
-    });
+    //$("#test").click(function () { 
+    //    var data = [50];
+    //    var label = ["Day 8"];
+    //    myLineChart.data.labels.pop();
+    //    myLineChart.data.datasets.forEach((dataset) => {
+    //        dataset.data.pop;
+    //    });
+    //    //myLineChart.data.datasets[0].data.push(data);
+    //    //myLineChart.options = {
+    //    //    scales: {
+    //    //        xAxes: [{
+    //    //            time: {
+    //    //                unit: 'date'
+    //    //            },
+    //    //            gridLines: {
+    //    //                display: false
+    //    //            },
+    //    //            ticks: {
+    //    //                maxTicksLimit: 7
+    //    //            }
+    //    //        }],
+    //    //        yAxes: [{
+    //    //            ticks: {
+    //    //                min: 0,
+    //    //                max: 50,
+    //    //                maxTicksLimit: 5
+    //    //            },
+    //    //            gridLines: {
+    //    //                color: "rgba(0, 0, 0, .125)",
+    //    //            }
+    //    //        }],
+    //    //    },
+    //    //    legend: {
+    //    //        display: true
+    //    //    }
+    //    //}
+    //    myLineChart.update();
+    //});
 
-    $(document).ready(function () {
+    $("#test").click(function () {
+        $('#loading-indicator').show();
+
         var json = JSON.stringify({
-            'ProgramID': "1"
+            'workoutID': $("#workoutSelect").find(":selected").val(),
+            'ExerciseID': $("#exerciseSelect").find(":selected").val()
         });
 
         $.ajax({
@@ -335,7 +351,8 @@
             data: json,
             success: function (data) {
                 var result = JSON.parse(data);
-                console.log(result);
+
+                $('#loading-indicator').hide();
 
                 $("#chartTitle").text("Your progress for workout: " + result.WorkoutName);
 
@@ -389,8 +406,10 @@
                     }
                 });
 
-                myLineChart.data.labels.push(result.Label);
-                myLineChart.data.datasets[0].data.push(result.Values);
+                for (var i = 0; i < result.Label.length; i++) {
+                    myLineChart.data.labels.push(result.Label[i]);
+                    myLineChart.data.datasets[0].data.push(result.Values[i]);
+                }
                 myLineChart.update();
             },   
             error: function () {

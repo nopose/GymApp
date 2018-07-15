@@ -46,6 +46,7 @@ namespace GymApp.Models
     public class ModelDummy
     {
         public int workoutID { get; set; }
+        public int ExerciseID { get; set; }
 
         public ModelDummy() { }
     }
