@@ -181,6 +181,19 @@ namespace GymApp.Models
         public string end { get; set; }
 
         public bool allDay { get; set; }
+        public string color { get; set; }
+    }
+
+    public class CalendarContent
+    {
+        public List<CalendarViewModel> data { get; set; } = new List<CalendarViewModel>();
+        public List<CalendarItem> items { get; set; } = new List<CalendarItem>();
+    }
+
+    public class CalendarItem
+    {
+        public string Name { get; set; }
+        public string Color { get; set; }
     }
     #endregion
 }

@@ -344,6 +344,7 @@ namespace GymApp.Controllers
         [HttpPost]
         public JsonResult GetEvents([FromBody]WorkoutViewModel data)
         {
+            string[] colors = { "red", "green", "blue", "orange", "grey" };
             List<TrainingProgram> workouts = getWorkoutsForUser();
 
             var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
@@ -351,9 +352,29 @@ namespace GymApp.Controllers
             var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
 
             List<Exercise> exercisesFromAPI = getExercisesFromAPIWithCustom();
+            //var events = new List<CalendarViewModel>();
+            var model = new CalendarContent();
+            DateTime start;
 
-            foreach (var pro in workouts)
+            for (var i = 0; i < workouts.Count; i++)
             {
+                var pro = workouts[i];
+                //model.data.Add(new CalendarViewModel()
+                //{
+                //    id = pro.id,
+                //    title = pro.name,
+                //    start = pro.StartDate.ToString(),
+                //    end = pro.EndDate.ToString(),
+                //    allDay = true,
+                //    color = "red"
+                //});
+                var color = colors[i % 5];
+                model.items.Add(new CalendarItem()
+                {
+                    Name = pro.name,
+                    Color = color
+                });
+
                 foreach (var ex in pro.Exercices)
                 {
                     foreach (var real_ex in exercisesFromAPI)
@@ -363,23 +384,33 @@ namespace GymApp.Controllers
                             ex.Name = real_ex.name;
                         }
                     }
+                    start = pro.StartDate.AddDays(ex.day - 1);
+                    model.data.Add(new CalendarViewModel()
+                    {
+                        id = ex.id,
+                        title = ex.Name,
+                        start = start.ToString(),
+                        end = start.ToString(),
+                        allDay = true,
+                        color = color
+                    });
                 }
             }
-            var events = new List<CalendarViewModel>();
 
-            for (var i = 0; i < workouts.Count; i++)
-            {
-                events.Add(new CalendarViewModel()
-                {
-                    id = workouts[i].id,
-                    title = workouts[i].name,
-                    start = workouts[i].StartDate.ToString(),
-                    end = workouts[i].EndDate.ToString(),
-                    allDay = true
-                });
+            //for (var i = 0; i < workouts.Count; i++)
+            //{
+            //events.Add(new CalendarViewModel()
+            //{
+            //    id = workouts[i].id,
+            //    title = workouts[i].name,
+            //    start = workouts[i].StartDate.ToString(),
+            //    end = workouts[i].EndDate.ToString(),
+            //    allDay = true
+            //});
 
-            }
-            return Json(JsonConvert.SerializeObject(events));
+            //}
+
+            return Json(JsonConvert.SerializeObject(model));
         }
         
 
