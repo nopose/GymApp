@@ -568,22 +568,23 @@ namespace GymApp.Controllers
         private List<Exercise> getExercisesFromAPI()
         {
             Result<Exercise> cacheExercises;
+            Result<Exercise> res;
 
-            if (!(_cache.TryGetValue("Exercises", out cacheExercises)))
+            if (!(_cache.TryGetValue("Exercises", out res)))
             {
                 var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
-                cacheExercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
+                res = JsonConvert.DeserializeObject<Result<Exercise>>(json);
 
-                cacheExercises = cacheExercises.ShallowCopy();
-                cacheExercises.results = cacheExercises.results.ToList();
+                cacheExercises = res.ShallowCopy();
+                cacheExercises.results = res.results.ToList();
 
                 // Save data in cache.
-                _cache.Set("Exercises", cacheExercises.ShallowCopy());
+                _cache.Set("Exercises", res.ShallowCopy());
             }
             else
             {
-                cacheExercises = cacheExercises.ShallowCopy();
-                cacheExercises.results = cacheExercises.results.ToList();
+                cacheExercises = res.ShallowCopy();
+                cacheExercises.results = res.results.ToList();
             }
 
             var userID = _userManager.GetUserId(User);
