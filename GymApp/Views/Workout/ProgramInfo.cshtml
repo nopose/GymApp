@@ -348,14 +348,14 @@ else
     <script>
 
         $(document).ready(function () {
-            $("#success").hide();
-            $("#errorAdd").hide();
+            $(".SuccessIF").hide();
+            $(".ErrorIf").hide();
             var counter = 0;
 
             $(".addrow").on("click", function () {
                 $(".addrow").hide();
-                $("#success").show();
-                $("#errorAdd").show();
+                $(".SuccessIF").show();
+                $(".ErrorIf").show();
                 var newRow = $('<tr id="insert">');
                 var cols = "";
 
@@ -375,8 +375,8 @@ else
 
             $("table.table-striped").on("click", ".ibtnRem", function (event) {
                 $(this).closest("tr").remove();
-                $("#success").hide();
-                $("#errorAdd").hide();
+                $(".SuccessIF").hide();
+                $(".ErrorIf").hide();
                 counter -= 1
                 $(".addrow").show();
             });
@@ -431,10 +431,10 @@ else
                                     $('td#trash' + (counter - 1)).html('<i onclick="setDelete(' + data.id + ')" class="fa fa-fw fa-trash" data-toggle="tooltip" data-placement="top" title="" data-original-title="Delete this set"></i>');
                                     $('tr#insert').attr("id", data.id);
 
-                                    $("#errorAdd").hide();
-                                    $("#success").text("Congrats! Your stats have been added to this workout successfully!").show();
+                                    $(".ErrorIf").hide();
+                                    $(".SuccessIF").text("Congrats! Your stats have been added to this workout successfully!").show();
                                     setTimeout(function () {
-                                        $("#success").fadeOut().empty();
+                                        $(".SuccessIF").fadeOut().empty();
                                     }, 5000);
                                 },
                                 error: function () {
@@ -445,14 +445,14 @@ else
                             $(this).remove();
                             $(".ibtnRem").remove();
 
-                        } else { $("#errorAdd").html("The weight can't be 0 and if it's greater than 0 the unit needs to be chosen as well"); $("#errorAdd").show(); }
+                        } else { $(".ErrorIf").html("The weight can't be 0 and if it's greater than 0 the unit needs to be chosen as well"); $(".ErrorIf").show(); }
                     } else {
-                        $("#errorAdd").html("The unit for the amount needs to be chosen");
-                        $("#errorAdd").show();
+                        $(".ErrorIf").html("The unit for the amount needs to be chosen");
+                        $(".ErrorIf").show();
                     }
                 } else {
-                    $("#errorAdd").html("A value for amount needs to be entered");
-                    $("#errorAdd").show();
+                    $(".ErrorIf").html("A value for amount needs to be entered");
+                    $(".ErrorIf").show();
                 }
             });
         });
@@ -497,9 +497,9 @@ else
                     success: function (data) {
 
                         $('#'+set).remove();
-                        $("#success").text("The Set was successfully deleted").show();
+                        $(".SuccessIF").text("The Set was successfully deleted").show();
                         setTimeout(function () {
-                            $("#success").fadeOut().empty();
+                            $(".SuccessIF").fadeOut().empty();
                         }, 5000);
                     },
                     error: function () {

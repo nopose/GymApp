@@ -280,7 +280,7 @@ namespace GymApp.Controllers
             program.Exercices.Sort((x, y) => x.day.CompareTo(y.day));
             int max = 0;
             int graphMax = 0;
-            int choice = 0;
+            int choice = 1;
             GraphDataJson result = new GraphDataJson();
             foreach (ProgramExercises ex in program.Exercices)
             {
@@ -304,7 +304,7 @@ namespace GymApp.Controllers
                             foreach (ExerciseSets set in ex.SetInfo)
                             {
                                 if (set.weight > max)
-                                    max = set.amount;
+                                    max = set.weight;
                                 if (max > graphMax)
                                     graphMax = max;
                             }
