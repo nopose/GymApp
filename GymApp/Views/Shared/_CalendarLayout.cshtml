@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html>
+@*<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>@ViewData["Title"] - GymApp</title>
+
+        <environment include="Development">
+            <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+            <link rel="stylesheet" href="~/css/site.css" />
+        </environment>
+        <environment exclude="Development">
+            <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+                  asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+                  asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+            <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        </environment>
+    </head>*@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>GymApp</title>
+    <!-- Bootstrap core CSS-->
+    <link href="~/style/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom fonts for this template-->
+    <link href="~/style/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- Custom styles for this template-->
+    <link href="~/style/css/sb-admin.css" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+
+    <!-- CSS Includes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.0.1/fullcalendar.min.css">
+
+    <style type="text/css">
+
+        .field-validation-error {
+            color: #ff0000;
+        }
+
+        #big-loading-indicator {
+            background-color: rgba(255, 255, 255, 0.7);
+            background-size: cover;
+            position: absolute;
+            left: 30%;
+            top: 30%;
+            height: 25%;
+            width: 25%;
+            z-index: 2000
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+        <a class="navbar-brand" href="@Url.Action("Index", "Home")" data-toggle="tooltip" data-placement="bottom" title="To Dashboard">GymApp</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            @await Html.PartialAsync("_UserMenuPartial")
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <form asp-controller="Home" asp-action="SearchExercises" method="post" class="form-inline my-2 my-lg-0 mr-lg-2">
+                        <div class="input-group">
+                            <input name="search" class="form-control" type="text" placeholder="Search for Exercises">
+                            <span class="input-group-append">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </span>
+                        </div>
+                    </form>
+                </li>
+            </ul>
+            @await Html.PartialAsync("_LoginPartial")
+        </div>
+    </nav>
+    @Html.Partial("SuccessMessage")
+        <div class="content-wrapper" style="padding-top:10%; margin-bottom:10%;">
+            @RenderBody()
+            <footer class="sticky-footer text-center">
+                &copy; 2018 - GymApp
+            </footer>
+        </div>
+
+    @RenderSection("Scripts", required: false)
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/style/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="~/style/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="~/style/js/sb-admin.min.js"></script>
+
+    <script>
+
+        $("#slowExercises").click(function () {
+            $('#big-loading-indicator').show();
+        });
+
+    </script>
+</body>
+</html>
+

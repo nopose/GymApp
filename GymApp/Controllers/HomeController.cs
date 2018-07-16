@@ -341,29 +341,44 @@ namespace GymApp.Controllers
             return View(new CalendarViewModel());
         }
 
-        public JsonResult GetEvents(DateTime start, DateTime end)
+        [HttpPost]
+        public JsonResult GetEvents([FromBody]WorkoutViewModel data)
         {
-            var viewModel = new CalendarViewModel();
-            var events = new List<CalendarViewModel>();
-            start = DateTime.Today.AddDays(-14);
-            end = DateTime.Today.AddDays(-11);
+            List<TrainingProgram> workouts = getWorkoutsForUser();
 
-            for (var i = 1; i <= 5; i++)
+            var exer = _context.PExercises.FromSql("SELECT * FROM PExercises").ToList(); // Need to do this to access the data ???
+
+            var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
+
+            List<Exercise> exercisesFromAPI = getExercisesFromAPIWithCustom();
+
+            foreach (var pro in workouts)
+            {
+                foreach (var ex in pro.Exercices)
+                {
+                    foreach (var real_ex in exercisesFromAPI)
+                    {
+                        if (ex.ExerciseID == real_ex.id)
+                        {
+                            ex.Name = real_ex.name;
+                        }
+                    }
+                }
+            }
+            var events = new List<CalendarViewModel>();
+
+            for (var i = 0; i < workouts.Count; i++)
             {
                 events.Add(new CalendarViewModel()
                 {
-                    id = i,
-                    title = "Event " + i,
-                    start = start.ToString(),
-                    end = end.ToString(),
-                    allDay = false
+                    id = workouts[i].id,
+                    title = workouts[i].name,
+                    start = workouts[i].StartDate.ToString(),
+                    end = workouts[i].EndDate.ToString(),
+                    allDay = true
                 });
 
-                start = start.AddDays(7);
-                end = end.AddDays(7);
             }
-
-
             return Json(JsonConvert.SerializeObject(events));
         }
         
