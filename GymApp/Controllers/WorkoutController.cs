@@ -21,7 +21,7 @@ namespace GymApp.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly GymAppContext _context;
         private IMemoryCache _cache;
-        public List<Exercise> ExercisesList { get; set; }
+        //public List<Exercise> ExercisesList { get; set; }
 
         public WorkoutController(
                     UserManager<AppUser> userManager,
@@ -33,7 +33,7 @@ namespace GymApp.Controllers
             _signInManager = signInManager;
             _context = context;
             _cache = cache;
-            ExercisesList = getExercisesFromAPI();
+            //ExercisesList = getExercisesFromAPI();
         }
 
         [HttpGet]
@@ -41,7 +41,7 @@ namespace GymApp.Controllers
         {
             List<TrainingProgram> workouts = getWorkoutsForUser();
 
-            ViewBag.Exercises = ExercisesList;
+            ViewBag.Exercises = getExercisesFromAPI();
             ViewBag.Workouts = workouts;
             return View("Program");
         }
@@ -73,12 +73,54 @@ namespace GymApp.Controllers
                 }
                 ViewBag.Program = program;
                 ViewBag.Names = exerciseNames;
-                ViewBag.Exercises = ExercisesList;
+                ViewBag.Exercises = exercisesFromAPI;
                 return View("ProgramInfo", new WorkoutViewModel());
             }
             TempData["ErrorMessage"] = "The Workout you've selected does not exist...";
             return View("Program");
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddCustomExercise(WorkoutViewModel model, string returnUrl = null)
+        {
+            ModelState.Remove("WorkoutName");
+            ModelState.Remove("WorkoutDescription");
+            ModelState.Remove("StartDate");
+            ModelState.Remove("EndDate");
+            ModelState.Remove("ExerciseID");
+            ModelState.Remove("Day");
+            ModelState.Remove("Amount");
+            ModelState.Remove("Aunit");
+
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                string userID = _userManager.GetUserId(User);
+
+                UserExercise newCustom = new UserExercise();
+
+                newCustom.uid = userID;
+                newCustom.name = model.CustomName + " (Custom)";
+                newCustom.description = model.CustomDescription;
+                newCustom.category = 0;
+
+                _context.UserEx.Add(newCustom);
+                _context.SaveChanges();
+
+                TempData["SuccessMessage"] = "Your Exercise has been created successfully!";
+                ViewBag.Exercises = getExercisesFromAPI();
+                ViewBag.Workouts = getWorkoutsForUser();
+                return View("Program");
+            }
+            TempData["ErrorMessage"] = "Oops... Something went wrong..";
+            ViewBag.Exercises = getExercisesFromAPI();
+            ViewBag.Workouts = getWorkoutsForUser();
+            return View("Program");
+        }
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -138,10 +180,13 @@ namespace GymApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddWorkout(WorkoutViewModel model, string returnUrl = null)
         {
+            List<Exercise> ExercisesList = getExercisesFromAPI();
             ModelState.Remove("ExerciseID");
             ModelState.Remove("Day");
             ModelState.Remove("Amount");
             ModelState.Remove("Aunit");
+            ModelState.Remove("CustomName");
+            ModelState.Remove("CustomDescription");
 
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
@@ -218,10 +263,13 @@ namespace GymApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult EditWorkout(WorkoutViewModel model, string returnUrl = null)
         {
+            List<Exercise> ExercisesList = getExercisesFromAPI();
             ModelState.Remove("ExerciseID");
             ModelState.Remove("Day");
             ModelState.Remove("Amount");
             ModelState.Remove("Aunit");
+            ModelState.Remove("CustomName");
+            ModelState.Remove("CustomDescription");
 
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
@@ -271,10 +319,15 @@ namespace GymApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddExerciseToWorkout(WorkoutViewModel model, string returnUrl = null)
         {
+            List<Exercise> ExercisesList = getExercisesFromAPI();
             ModelState.Remove("WorkoutName");
             ModelState.Remove("WorkoutDescription");
             ModelState.Remove("StartDate");
             ModelState.Remove("EndDate");
+            ModelState.Remove("CustomName");
+            ModelState.Remove("CustomDescription");
+
+
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
@@ -332,10 +385,15 @@ namespace GymApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddExerciseToDay(WorkoutViewModel model, string returnUrl = null)
         {
+            List<Exercise> ExercisesList = getExercisesFromAPI();
             ModelState.Remove("WorkoutName");
             ModelState.Remove("WorkoutDescription");
             ModelState.Remove("StartDate");
             ModelState.Remove("EndDate");
+            ModelState.Remove("CustomName");
+            ModelState.Remove("CustomDescription");
+
+
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
@@ -384,7 +442,7 @@ namespace GymApp.Controllers
 
                 var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
 
-                List<Exercise> exercisesFromAPI = getExercisesFromAPI();
+                List<Exercise> exercisesFromAPI = ExercisesList;
 
                 foreach (var ex in tp.Exercices)
                 {
@@ -442,6 +500,8 @@ namespace GymApp.Controllers
             ModelState.Remove("WorkoutDescription");
             ModelState.Remove("StartDate");
             ModelState.Remove("EndDate");
+            ModelState.Remove("CustomName");
+            ModelState.Remove("CustomDescription");
 
             Dictionary<int, string> exerciseNames = new Dictionary<int, string>();
             TrainingProgram tp = await _context.Workouts.FirstOrDefaultAsync(W => W.id == model.ProgramID && W.uid == _userManager.GetUserId(User));
@@ -478,13 +538,13 @@ namespace GymApp.Controllers
                 TempData["SuccessMessage"] = "Your Exercise has been edited successfully!";
                 ViewBag.Program = tp;
                 ViewBag.Names = exerciseNames;
-                ViewBag.Exercises = ExercisesList;
+                ViewBag.Exercises = exercisesFromAPI;
                 return View("ProgramInfo", new WorkoutViewModel());
             }
             TempData["ErrorMessage"] = "Oops... Something went wrong..";
             ViewBag.Program = tp;
             ViewBag.Names = exerciseNames;
-            ViewBag.Exercises = ExercisesList;
+            ViewBag.Exercises = exercisesFromAPI;
             return View("ProgramInfo", model);
         }
 
@@ -514,8 +574,32 @@ namespace GymApp.Controllers
                 var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
                 cacheExercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
 
+                cacheExercises = cacheExercises.ShallowCopy();
+                cacheExercises.results = cacheExercises.results.ToList();
+
                 // Save data in cache.
                 _cache.Set("Exercises", cacheExercises.ShallowCopy());
+            }
+            else
+            {
+                cacheExercises = cacheExercises.ShallowCopy();
+                cacheExercises.results = cacheExercises.results.ToList();
+            }
+
+            var userID = _userManager.GetUserId(User);
+            List<UserExercise> userEx = _context.UserEx
+                    .Where(W => W.uid.Equals(userID))
+                    .OrderBy(W => W.name)
+                    .ToList();
+
+            foreach(UserExercise ex in userEx)
+            {
+                cacheExercises.results.Insert(0, new Exercise()
+                {
+                    id = ex.id,
+                    name = ex.name,
+                    description = ex.description
+                });
             }
 
             return cacheExercises.results;

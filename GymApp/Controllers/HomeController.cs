@@ -49,7 +49,7 @@ namespace GymApp.Controllers
 
             var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
 
-            List<Exercise> exercisesFromAPI = getExercisesFromAPI();
+            List<Exercise> exercisesFromAPI = getExercisesFromAPIWithCustom();
             
             foreach (var pro in workouts)
             {
@@ -138,6 +138,7 @@ namespace GymApp.Controllers
             {
                 model = new ExercisesViewModel(false);
 
+                model.Exercises.results = model.Exercises.results.ToList();
                 // Save data in cache.
                 _cache.Set("Exercises", model.Exercises.ShallowCopy());
 
@@ -153,7 +154,6 @@ namespace GymApp.Controllers
             }
 
             ViewBag.Workouts = getWorkoutsForUser();
-
             return View(model);
         }
 
@@ -167,6 +167,7 @@ namespace GymApp.Controllers
             {
                 model = new ExercisesViewModel(false, Convert.ToString(form["search"]));
 
+                model.Exercises.results = model.Exercises.results.ToList();
                 Result<Exercise> copy = model.Exercises.ShallowCopy();
 
                 // Save data in cache.
@@ -297,6 +298,7 @@ namespace GymApp.Controllers
                             }
                             result.Label.Add("Day " + ex.day);
                             result.Values.Add(max.ToString());
+                            max = 0;
                             break;
                         case 1:
                             foreach (ExerciseSets set in ex.SetInfo)
@@ -308,6 +310,7 @@ namespace GymApp.Controllers
                             }
                             result.Label.Add("Day " + ex.day);
                             result.Values.Add(max.ToString());
+                            max = 0;
                             break;
                     }
                     
@@ -363,10 +366,7 @@ namespace GymApp.Controllers
 
             return Json(JsonConvert.SerializeObject(events));
         }
-
-
-
-
+        
 
         private List<TrainingProgram> getWorkoutsForUser()
         {
@@ -394,8 +394,56 @@ namespace GymApp.Controllers
                 var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
                 cacheExercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
 
+                cacheExercises = cacheExercises.ShallowCopy();
+                cacheExercises.results = cacheExercises.results.ToList();
+
                 // Save data in cache.
                 _cache.Set("Exercises", cacheExercises.ShallowCopy());
+            }
+            else
+            {
+                cacheExercises = cacheExercises.ShallowCopy();
+                cacheExercises.results = cacheExercises.results.ToList();
+            }
+
+            return cacheExercises.results;
+        }
+
+        private List<Exercise> getExercisesFromAPIWithCustom()
+        {
+            Result<Exercise> cacheExercises;
+
+            if (!(_cache.TryGetValue("Exercises", out cacheExercises)))
+            {
+                var json = new WebClient().DownloadString("https://wger.de/api/v2/exercise/?limit=2000&language=2&status=2");
+                cacheExercises = JsonConvert.DeserializeObject<Result<Exercise>>(json);
+
+                cacheExercises = cacheExercises.ShallowCopy();
+                cacheExercises.results = cacheExercises.results.ToList();
+
+                // Save data in cache.
+                _cache.Set("Exercises", cacheExercises.ShallowCopy());
+            }
+            else
+            {
+                cacheExercises = cacheExercises.ShallowCopy();
+                cacheExercises.results = cacheExercises.results.ToList();
+            }
+
+            var userID = _userManager.GetUserId(User);
+            List<UserExercise> userEx = _context.UserEx
+                    .Where(W => W.uid.Equals(userID))
+                    .OrderBy(W => W.name)
+                    .ToList();
+
+            foreach (UserExercise ex in userEx)
+            {
+                cacheExercises.results.Insert(0, new Exercise()
+                {
+                    id = ex.id,
+                    name = ex.name,
+                    description = ex.description
+                });
             }
 
             return cacheExercises.results;
@@ -403,9 +451,17 @@ namespace GymApp.Controllers
 
         private string getExerciseName(int id)
         {
-            var json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseinfo/" + id);
-            ExerciseInfo ex = JsonConvert.DeserializeObject<ExerciseInfo>(json);
-            return ex.name;
+            if(id < 1000)
+            {
+                var json = new WebClient().DownloadString("https://wger.de/api/v2/exerciseinfo/" + id);
+                ExerciseInfo ex = JsonConvert.DeserializeObject<ExerciseInfo>(json);
+                return ex.name;
+            }
+            else
+            {
+                var ex = _context.UserEx.FirstOrDefault(x => x.id == id);
+                return ex.name;
+            }
         }
 
         //calculate the day number to match with the workout

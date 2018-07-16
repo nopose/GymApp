@@ -58,12 +58,16 @@
                                             if (ex.day == work.ActualDay)
                                             {
                                                 //var name = Model.schedule.ExerciseNames.GetValueOrDefault(ex.ExerciseID);
-                                                //if (name != null)
-                                                //{
+                                                if (ex.ExerciseID < 1000)
+                                                {
                                                 <li>
                                                     @Html.ActionLink(ex.Name, "ExerciseDetail", "Home", new { id = ex.ExerciseID }, new { @class = "text-white", data_toggle = "tooltip", data_placement = "top", title = "More info about this Exercise" })
                                                 </li>
-                                                //}
+                                                }
+                                                else
+                                                {
+                                                    <li>@ex.Name</li>
+                                                }
 
                                             }
                                         }

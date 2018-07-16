@@ -53,5 +53,17 @@ namespace GymApp.Models
 
         [Display(Name = "Unit")]
         public Nullable<int> Wunit { get; set; }
+
+        //Custom exercise
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 5)]
+        [Display(Name = "Exercise name")]
+        public string CustomName { get; set; }
+
+        [StringLength(1000, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 0)]
+        [Display(Name = "Description")]
+        public string CustomDescription { get; set; }
+
+
     }
 }

@@ -9,7 +9,7 @@ html {
 #homePageBackground:before {
     /*background: url("/../images/lightBackground.jpg");*/
     background: url("/../images/darkBackground.png");
-    height: 100%;
+    height: 110%;
     width: 100%;
     background-position: center;
     background-repeat: no-repeat;

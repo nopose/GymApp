@@ -96,6 +96,12 @@
         </div>
     }
 
+    <div class="card">
+        <div class="card-body">
+            <button class="btn btn-primary col-md-12" data-toggle="modal" data-target="#CreateExerciseModal">Don't find the exercise you are looking for? Create your own</button>
+        </div>
+    </div>
+
     <div class="modal fade" id="CreateProgramModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -286,6 +292,42 @@
         </div>
     </div>
 
+    <div class="modal fade" id="CreateExerciseModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Creating a new custom Exercise</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                @using (Html.BeginForm("AddCustomExercise", "Workout", FormMethod.Post, new { id = "CreateExerciseForm" }))
+                {
+                    <div class="modal-body">
+                        <input id="uid" asp-for="UserID" hidden value="@user.Id" />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="CustomName"></label>
+                            <input id="WorkoutName" asp-for="CustomName" class="form-control" />
+                            <span asp-validation-for="CustomName" class="text-danger"></span>
+                            <em>Between 5 and 100 characters</em>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label asp-for="CustomDescription"></label>
+                            <input asp-for="CustomDescription" class="form-control" />
+                            <span asp-validation-for="CustomDescription" class="text-danger"></span>
+                            <em>Max 100 characters</em>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
 </div>
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
@@ -354,6 +396,13 @@
             $("#EditWorkoutForm").trigger("reset");
             $("#EditWorkoutForm").find(".validation-summary-valid ul").html("");
             $("#EditWorkoutForm").find(".field-validation-valid").empty();
+        });
+
+
+        $("#CreateExerciseModal").on("hidden.bs.modal", function () {
+            $("#CreateExerciseForm").trigger("reset");
+            $("#CreateExerciseForm").find(".validation-summary-valid ul").html("");
+            $("#CreateExerciseForm").find(".field-validation-valid").empty();
         });
     </script>
 
