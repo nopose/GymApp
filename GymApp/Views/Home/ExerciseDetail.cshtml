@@ -1,7 +1,5 @@
 ﻿@model ExerciseDetailViewModel
 
-
-
 <div class="row">
     <div class="col-3">
         @{ var url = Model.exerciseImage != null ? Model.exerciseImage.image : "/images/dumbbellSVG.png";}
@@ -91,9 +89,7 @@
                     @:none
                 }
             </div>
-            @*TODO maybe add comments(from API) section*@
         </div>
     </div>
     @Html.ActionLink("Back to exercises", "Exercises", "Home", null, new { @class = "btn btn-primary col-md-3" })
 </div>
-

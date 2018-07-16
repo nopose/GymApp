@@ -1,101 +1,125 @@
-﻿@{
+﻿@inject SignInManager<AppUser> SignInManager
+@if (SignInManager.IsSignedIn(User))
+{
+
     ViewData["Title"] = "About";
-}
-<h2>@ViewData["Title"]</h2>
-<hr />
-<h3 class="text-justify">@ViewData["Message"]</h3>
-
-<div class="mymodal"><img src="~/images/45.gif" id="big-loading-indicator" style="display:none" /></div>
-<div class="container" style="margin-top:4%;">
-
-    <div class="form-group-sm" style="margin-top:2%;">
-        <h3>Icons</h3>
-        <table class="table-responsive-md table">
-            <thead>
-                <tr class="text-center">
-                    <th colspan="1">Icons</th>
-                    <th colspan="1">Explanation</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><i class="fa fa-fw fa-sign-out"></i></td>
-                    <td>This is the <b><em>Logout</em></b> icon, allowing you to log out of our website when you'd like to exit this webapp.</td>
-                </tr>
-                <tr>
-                    <td><i class="fa fa-fw fa-sign-in"></i></td>
-                    <td>This is the <b><em>Login</em></b> icon, allowing you to be redirected into the website to be able to connect to your account and use you exclusive user actions/options.</td>
-                </tr>
-                <tr>
-                    <td><i class="fa fa-fw fa-bar-chart"></i></td>
-                    <td>This is the <b><em>Chart</em></b> icon, allowing you to vizualize your statistics, next workout for the day, and other cool functionnalities that come with the chart system.</td>
-                </tr>
-                <tr>
-                    <td><i class="fa fa-fw fa-table"></i></td>
-                    <td>This is the <b><em>Workout</em></b> icon, allowing you to access to your current workout(s) and adding new ones if you want to.</td>
-                </tr>
-                <tr>
-                    <td><i class="fa fa-fw fa-heartbeat"></i></td>
-                    <td>This is the <b><em>Exercises Information</em></b> icon, allowing you to access and scroll through more than 50 exercises for you to read about, add to your workouts and more.</td>
-                </tr>
-                <tr>
-                    <td><i class="fa fa-fw fa-calendar"></i></td>
-                    <td>This is the <b><em>Calendar</em></b> icon, allowing you to access to your customized calendar. This calendar contains your current "main" workout and exercises for each day of the week.</td>
-                </tr>
-                <tr>
-                    <td><i class="fa fa-fw fa-info-circle"></i></td>
-                    <td>This is the <b><em>Information</em></b> icon, allowing you to access this very page.</td>
-                </tr>
-            </tbody>
-        </table>
-        <em style="font-size:0.8em;" class="text-primary">The other icons used are pretty straight forward and easy to understand. They are mainly used to add, delete or update your current information.</em>
-    </div>
+    <h2>@ViewData["Title"]</h2>
     <hr />
-    <div class="form-group-sm" style="margin-top:2%;">
-        <h3>Sections</h3>
-        <table class="table-responsive-md table">
-            <thead>
-                <tr class="text-center">
-                    <th colspan="1">Sections</th>
-                    <th colspan="1">Explanations</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Dashboard</td>
-                    <td>
-                        This is the section where all your information about your sets for each exercises can be found. We've put togheter a simple chart allowing you to vizualize your performance for each exercise for each program.
-                        Also, you are able to see, at the very top, all the current workouts, hence exercises, for the day as well as a suggestion from us if you want to try something new or don't know what to do. Take the time to familiarize
-                        with it, this is your new best friend for your workouts.
-                    </td>
-                </tr>
-                <tr>
-                    <td>Workouts</td>
-                    <td>
-                        This is the section where all your workouts are displayed. For each them, you can add nee exercises to complete your workout, you can see its information (Exercises, sets, etc.), which is explained in the next section.
-                        You can also delete it if you think you are done with it, or if you have made a mistake. Furthermore, this section is also allowing you to add brand new workout, if you want.
-                    </td>
-                </tr>
-                <tr>
-                    <td>Workout Information</td>
-                    <td>
-                        This is the section where you can see all the exercises that are related to this workout categorized by the day of the week. Also, you can expand each exercise and vizualize, in a different way than a chart, your sets for this exercise in this program. You can also delete an exercise from your workout.
-                        For each set, you can see the amount, and the weight (if applicable). You can add new sets and delete old ones.
-                    </td>
-                </tr>
-                <tr>
-                    <td>Manage</td>
-                    <td>This is the section where you can manage your personal, physical information, as well as modifying your passwork (if needed). You physical information are used to produce small statistics related to your age, weight and height. Nothing to fancy!</td>
-                </tr>
-                <tr>
-                    <td>Calendar</td>
-                    <td>
-                        This is the section where you can vizualize your workouts on a calendar. In fact, for each workout, you'd be able to see each exercise you have to do for each day of the week. It's just another way for you to vizualize your workout, and maybe print it in this version
-                        to put it on the fridge or something.
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <em style="font-size:0.8em;" class="text-primary">The other sections created are pretty straight forward and easy to understand. They have been created mainly for the login, logout and register functionnalities of the website.</em>
+    <h3 class="text-justify">@ViewData["Message"]</h3>
+
+    <div class="mymodal"><img src="~/images/45.gif" id="big-loading-indicator" style="display:none" /></div>
+    <div class="container" style="margin-top:4%;">
+
+        <div class="form-group-sm" style="margin-top:2%;">
+            <h3>Icons</h3>
+            <table class="table-responsive-md table">
+                <thead>
+                    <tr class="text-center">
+                        <th colspan="1">Icons</th>
+                        <th colspan="1">Explanation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="fa fa-fw fa-sign-out"></i></td>
+                        <td>This is the <b><em>Logout</em></b> icon, allowing you to log out of our website when you'd like to exit this webapp.</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa fa-fw fa-sign-in"></i></td>
+                        <td>This is the <b><em>Login</em></b> icon, allowing you to be redirected into the website to be able to connect to your account and use you exclusive user actions/options.</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa fa-fw fa-bar-chart"></i></td>
+                        <td>This is the <b><em>Chart</em></b> icon, allowing you to vizualize your statistics, next workout for the day, and other cool functionnalities that come with the chart system.</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa fa-fw fa-table"></i></td>
+                        <td>This is the <b><em>Workout</em></b> icon, allowing you to access to your current workout(s) and adding new ones if you want to.</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa fa-fw fa-heartbeat"></i></td>
+                        <td>This is the <b><em>Exercises Information</em></b> icon, allowing you to access and scroll through more than 50 exercises for you to read about, add to your workouts and more.</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa fa-fw fa-calendar"></i></td>
+                        <td>This is the <b><em>Calendar</em></b> icon, allowing you to access to your customized calendar. This calendar contains your current "main" workout and exercises for each day of the week.</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa fa-fw fa-info-circle"></i></td>
+                        <td>This is the <b><em>Information</em></b> icon, allowing you to access this very page.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <em style="font-size:0.8em;" class="text-primary">The other icons used are pretty straight forward and easy to understand. They are mainly used to add, delete or update your current information.</em>
+        </div>
+        <hr />
+        <div class="form-group-sm" style="margin-top:2%;">
+            <h3>Sections</h3>
+            <table class="table-responsive-md table">
+                <thead>
+                    <tr class="text-center">
+                        <th colspan="1">Sections</th>
+                        <th colspan="1">Explanations</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dashboard</td>
+                        <td>
+                            This is the section where all your information about your sets for each exercises can be found. We've put togheter a simple chart allowing you to vizualize your performance for each exercise for each program.
+                            Also, you are able to see, at the very top, all the current workouts, hence exercises, for the day as well as a suggestion from us if you want to try something new or don't know what to do. Take the time to familiarize
+                            with it, this is your new best friend for your workouts.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Workouts</td>
+                        <td>
+                            This is the section where all your workouts are displayed. For each them, you can add nee exercises to complete your workout, you can see its information (Exercises, sets, etc.), which is explained in the next section.
+                            You can also delete it if you think you are done with it, or if you have made a mistake. Furthermore, this section is also allowing you to add brand new workout, if you want.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Workout Information</td>
+                        <td>
+                            This is the section where you can see all the exercises that are related to this workout categorized by the day of the week. Also, you can expand each exercise and vizualize, in a different way than a chart, your sets for this exercise in this program. You can also delete an exercise from your workout.
+                            For each set, you can see the amount, and the weight (if applicable). You can add new sets and delete old ones.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Manage</td>
+                        <td>This is the section where you can manage your personal, physical information, as well as modifying your passwork (if needed). You physical information are used to produce small statistics related to your age, weight and height. Nothing to fancy!</td>
+                    </tr>
+                    <tr>
+                        <td>Calendar</td>
+                        <td>
+                            This is the section where you can vizualize your workouts on a calendar. In fact, for each workout, you'd be able to see each exercise you have to do for each day of the week. It's just another way for you to vizualize your workout, and maybe print it in this version
+                            to put it on the fridge or something.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <em style="font-size:0.8em;" class="text-primary">The other sections created are pretty straight forward and easy to understand. They have been created mainly for the login, logout and register functionnalities of the website.</em>
+        </div>
     </div>
-</div>
+}
+else
+{
+    <div class="container h-50" style="margin-top:32%;">
+        <div class="row w-100 text-center">
+            <div class="col-md-12">
+                <h1 id="homeTitle" class="display-3 text-dark font-weight-bold">You are not logged in</h1>
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-12" style="padding-top:3%;">
+                @Html.ActionLink("Register now !", "Register", "Account", null, new { @class = "btn btn-primary col-md-4", style = "margin: 0.5rem" })
+            </div>
+        </div>
+        <div class="row text-center">
+            <div class="col-md-12">
+
+                @Html.ActionLink("Login to your account", "Login", "Account", null, new { @class = "btn btn-primary col-md-4", style = "margin: 0.5rem" })
+            </div>
+        </div>
+    </div>
+}

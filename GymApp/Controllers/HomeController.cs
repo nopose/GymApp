@@ -96,7 +96,7 @@ namespace GymApp.Controllers
 
             var sets = _context.ESets.FromSql("SELECT * FROM ESets").ToList(); // Need to do this to access the data ???
 
-            List<Exercise> exercisesFromAPI = getExercisesFromAPI();
+            List<Exercise> exercisesFromAPI = getExercisesFromAPIWithCustom();
             List<ProgramExercises> filtered = new List<ProgramExercises>();
 
             if (!(program is null))

@@ -25,6 +25,8 @@
         user = await UserManager.GetUserAsync(User);
     }
 }
+@if (SignInManager.IsSignedIn(User))
+{
 <style>
     #loading-indicator {
         background-color:rgba(255, 255, 255, 0.7);
@@ -37,8 +39,8 @@
 <h2>@ViewData["Title"]</h2>
 <hr />
 <div class="container">
-    
-<div class="mymodal"><img src="~/images/45.gif" id="big-loading-indicator" style="display:none" /></div>
+
+    <div class="mymodal"><img src="~/images/45.gif" id="big-loading-indicator" style="display:none" /></div>
     @using (Html.BeginForm("AddSets", "Workout", FormMethod.Post, new { id = "AddSetsForm" }))
     {
     }
@@ -148,7 +150,7 @@
                                                                         </td>
                                                                     </tr>
                                                                     @*<div class="SuccessIF text-success"></div>
-                                                                    <div class="ErrorIf text-danger"></div>*@
+                                                                        <div class="ErrorIf text-danger"></div>*@
                                                                 }
                                                             }
                                                         </tbody>
@@ -315,8 +317,30 @@
         </div>
     </div>
 
-    </div>
+</div>
 <div class="mymodal"><img src="~/images/45.gif" id="loading-indicator" style="display:none" /></div>
+}
+else
+{
+<div class="container h-50" style="margin-top:32%;">
+    <div class="row w-100 text-center">
+        <div class="col-md-12">
+            <h1 id="homeTitle" class="display-3 text-dark font-weight-bold">You are not logged in</h1>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-12" style="padding-top:3%;">
+            @Html.ActionLink("Register now !", "Register", "Account", null, new { @class = "btn btn-primary col-md-4", style = "margin: 0.5rem" })
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-12">
+
+            @Html.ActionLink("Login to your account", "Login", "Account", null, new { @class = "btn btn-primary col-md-4", style = "margin: 0.5rem" })
+        </div>
+    </div>
+</div>
+}
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
 
@@ -504,7 +528,7 @@
                     dataType: "json",
                     data: json,
                     success: function (data) {
-                        $('#exercise' + ex).remove(); 
+                        $('#exercise' + ex).remove();
                         $("#topList").text("The Exercise and associated Sets were successfully deleted");
                         setTimeout(function () {
                             $("#topList").fadeOut().empty();
